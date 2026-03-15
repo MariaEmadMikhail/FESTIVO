@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Festivo | Submit Service</title>
+    <!-- Use the existing homepage styles and provider specific styles -->
+    <link rel="stylesheet" href="../home%20page/styles.css">
+    <link rel="stylesheet" href="provider.css">
+    <!-- Reusing auth styling for the clean form look -->
+    <link rel="stylesheet" href="../auth/auth.css">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        /* Specific tweaks for submission form */
+        .submission-container {
+            margin-top: 100px; /* Account for fixed nav */
+            margin-bottom: 60px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 100%;
+        }
+        
+        #submission-form {
+            width: 100%;
+        }
+
+        .input-group select {
+            width: 100%;
+            padding: 1rem;
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            background: rgba(15, 23, 42, 0.6);
+            color: var(--text);
+            font-size: 1rem;
+            outline: none;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            appearance: none;
+            background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+            background-repeat: no-repeat;
+            background-position: right 1rem center;
+            background-size: 1em;
+        }
+
+        .input-group select:focus {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(0, 206, 201, 0.2);
+        }
+        
+        .input-group select option {
+            background-color: #0f172a;
+            color: white;
+        }
+
+        /* File Upload Styling */
+        .file-upload-wrapper {
+            position: relative;
+            width: 100%;
+            height: 120px;
+            border: 2px dashed rgba(255, 255, 255, 0.2);
+            border-radius: 12px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: rgba(15, 23, 42, 0.3);
+            transition: all 0.3s ease;
+            cursor: pointer;
+            overflow: hidden;
+        }
+
+        .file-upload-wrapper:hover {
+            border-color: var(--accent);
+            background: rgba(0, 206, 201, 0.05);
+        }
+
+        .file-upload-input {
+            position: absolute;
+            left: 0;
+            top: 0;
+            height: 100%;
+            width: 100%;
+            cursor: pointer;
+            opacity: 0;
+            z-index: 10;
+        }
+
+        .file-upload-text {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            margin-top: 8px;
+            text-align: center;
+        }
+
+        .file-name-display {
+            margin-top: 5px;
+            font-size: 0.85rem;
+            color: var(--accent);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 90%;
+        }
+
+        /* Success Message Styling */
+        #success-message {
+            display: none;
+            background: rgba(0, 255, 0, 0.1);
+            border: 1px solid rgba(0, 255, 0, 0.3);
+            border-radius: 12px;
+            padding: 2rem;
+            text-align: center;
+            margin-top: 2rem;
+        }
+
+        #success-message.visible {
+            display: block;
+            animation: fadeIn 0.5s ease;
+        }
+
+        #success-message h2 {
+            color: #4ade80;
+            margin-bottom: 1rem;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body>
+    <div class="background-shapes">
+        <div class="shape shape-1"></div>
+        <div class="shape shape-2"></div>
+        <div class="shape shape-3"></div>
+    </div>
+
+    <!-- Provider Navigation Bar -->
+    <nav class="navbar" style="position: fixed; top: 0; width: 100%; z-index: 100;">
+        <div class="nav-container">
+            <a href="index.html" class="nav-logo">
+                <img src="../logo.png" alt="Festivo" style="height: 40px; vertical-align: middle;">
+            </a>
+            
+            <div class="nav-links" id="navLinks">
+                <a href="index.html">HOME</a>
+                <a href="submission.html" class="active">Become a provider</a>
+                
+                <a href="../home%20page/index.html" class="logout-btn">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 5px; vertical-align: text-bottom;"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
+                    Logout
+                </a>
+            </div>
+
+            <button class="menu-toggle" id="mobileMenuBtn">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+        </div>
+    </nav>
+
+    <!-- Submission Form Wrapper -->
+    <div class="submission-container">
+        <div class="auth-box" id="form-container">
+            <div class="header">
+                <h1 style="color: var(--secondary)">Offer a Service</h1>
+                <p>Add a new product or service to Festivo</p>
+            </div>
+            
+            <form id="submission-form">
+                <div class="input-group">
+                    <label for="providerName">Full Name</label>
+                    <input type="text" id="providerName" name="providerName" placeholder="Text only e.g. John Doe" required>
+                    <span class="error" id="nameError">Letters and spaces only</span>
+                </div>
+
+                <div class="form-row">
+                    <div class="input-group">
+                        <label for="providerEmail">Contact Email</label>
+                        <input type="email" id="providerEmail" name="providerEmail" placeholder="your@email.com" required>
+                        <span class="error" id="emailError">Invalid email format</span>
+                    </div>
+                    <div class="input-group">
+                        <label for="providerPhone">Phone Number</label>
+                        <input type="text" id="providerPhone" name="providerPhone" placeholder="Numbers only (e.g. 1234567890)" required>
+                        <span class="error" id="phoneError">Numbers only</span>
+                    </div>
+                </div>
+
+                <div class="input-group">
+                    <label for="productType">Type of Product/Service</label>
+                    <select id="productType" name="productType" required>
+                        <option value="" disabled selected>Select a category...</option>
+                        <option value="chairs_tables">Chairs and Tables</option>
+                        <option value="bean_bags">Bean Bags</option>
+                        <option value="flowers">Flowers</option>
+                        <option value="draping_fabric">Draping and Fabric Styling</option>
+                        <option value="themed_props">Themed Props</option>
+                        <option value="candles_lanterns">Candles and Lanterns</option>
+                        <option value="arches">Arches</option>
+                        <option value="table_centerpieces">Table Centerpieces</option>
+                    </select>
+                </div>
+
+                <div class="input-group">
+                    <label for="quantity">Available Quantity</label>
+                    <input type="number" id="quantity" name="quantity" placeholder="e.g. 50" min="1" required>
+                </div>
+
+                <div class="input-group">
+                    <label>Media Upload (Photo or Video)</label>
+                    <div class="file-upload-wrapper">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--text-muted)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
+                        <div class="file-upload-text">Click or drag file to upload<br><span style="font-size: 0.8em; opacity: 0.7;">Accepted: JPG, PNG, MP4</span></div>
+                        <input type="file" id="mediaUpload" name="mediaUpload" class="file-upload-input" accept=".jpg,.jpeg,.png,.mp4" required>
+                        <div class="file-name-display" id="fileNameDisplay"></div>
+                    </div>
+                    <span class="error" id="fileError" style="margin-top: 5px;">Invalid file format. Please upload JPG, PNG, or MP4.</span>
+                </div>
+
+                <button type="submit" class="submit-btn pulse-btn" style="margin-top: 1rem; width: 100%;">Submit Application</button>
+            </form>
+
+            <div id="success-message">
+                <h2>🎉 Thank You!</h2>
+                <p>Thank you for submitting your service application.</p>
+                <p style="margin-top: 10px; color: var(--text-muted);">We will review your application and contact you within <strong>3-5 business days</strong> if approved only.</p>
+                <a href="index.html" class="primary-btn" style="margin-top: 20px; display: inline-block;">Return to Provider Home</a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Mobile Menu
+        document.getElementById('mobileMenuBtn').addEventListener('click', function() {
+            document.getElementById('navLinks').classList.toggle('active');
+            this.classList.toggle('open');
+        });
+        
+        // Handle Logout
+        document.querySelector('.logout-btn').addEventListener('click', function(e) {
+            e.preventDefault();
+            if(confirm('Are you sure you want to log out?')) {
+                window.location.href = this.getAttribute('href');
+            }
+        });
+
+        // File Uploader Display Logic
+        const fileInput = document.getElementById('mediaUpload');
+        const fileNameDisplay = document.getElementById('fileNameDisplay');
+        const fileError = document.getElementById('fileError');
+
+        fileInput.addEventListener('change', function(e) {
+            if (this.files && this.files.length > 0) {
+                const file = this.files[0];
+                const validExtensions = ['jpg', 'jpeg', 'png', 'mp4'];
+                const fileExtension = file.name.split('.').pop().toLowerCase();
+                
+                if (validExtensions.includes(fileExtension)) {
+                    fileNameDisplay.textContent = file.name;
+                    fileError.classList.remove('visible');
+                } else {
+                    fileNameDisplay.textContent = '';
+                    fileError.classList.add('visible');
+                    this.value = ''; // Clear invalid file
+                }
+            } else {
+                fileNameDisplay.textContent = '';
+            }
+        });
+
+        // Form Validation & Submission
+        const form = document.getElementById('submission-form');
+        const nameInput = document.getElementById('providerName');
+        const emailInput = document.getElementById('providerEmail');
+        const phoneInput = document.getElementById('providerPhone');
+        
+        const nameError = document.getElementById('nameError');
+        const emailError = document.getElementById('emailError');
+        const phoneError = document.getElementById('phoneError');
+        
+        const successMessage = document.getElementById('success-message');
+
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+            let isValid = true;
+
+            // Name validation (letters and spaces only)
+            const nameRegex = /^[A-Za-z\s]+$/;
+            if (!nameRegex.test(nameInput.value.trim())) {
+                nameError.classList.add('visible');
+                nameInput.style.borderColor = 'var(--error)';
+                isValid = false;
+            } else {
+                nameError.classList.remove('visible');
+                nameInput.style.borderColor = '';
+            }
+
+            // Email validation
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailRegex.test(emailInput.value.trim())) {
+                emailError.classList.add('visible');
+                emailInput.style.borderColor = 'var(--error)';
+                isValid = false;
+            } else {
+                emailError.classList.remove('visible');
+                emailInput.style.borderColor = '';
+            }
+
+            // Phone validation (numbers only)
+            const phoneRegex = /^[0-9]+$/;
+            if (!phoneRegex.test(phoneInput.value.trim())) {
+                phoneError.classList.add('visible');
+                phoneInput.style.borderColor = 'var(--error)';
+                isValid = false;
+            } else {
+                phoneError.classList.remove('visible');
+                phoneInput.style.borderColor = '';
+            }
+            
+            // Media Validation
+            if (!fileInput.files || fileInput.files.length === 0) {
+                fileError.classList.add('visible');
+                isValid = false;
+            }
+
+            if (isValid) {
+                // Simulate submission
+                const submitBtn = form.querySelector('.submit-btn');
+                submitBtn.innerHTML = '<span style="display:inline-block; animation: spin 1s infinite linear;">↻</span> Submitting...';
+                
+                setTimeout(() => {
+                    form.style.display = 'none';
+                    successMessage.classList.add('visible');
+                }, 1500);
+            }
+        });
+    </script>
+</body>
+</html>

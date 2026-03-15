@@ -1,0 +1,54 @@
+/* 
+   PROVIDER DASHBOARD SPECIFIC STYLES 
+   Builds on top of main styles.css
+*/
+
+.logout-btn {
+    display: flex;
+    align-items: center;
+    color: var(--error) !important;
+    border: 1px solid rgba(255, 71, 87, 0.3);
+    padding: 0.4rem 1rem;
+    border-radius: 8px;
+    transition: all 0.3s ease !important;
+}
+
+.logout-btn::after {
+    display: none !important;
+}
+
+.logout-btn:hover {
+    background: rgba(255, 71, 87, 0.1);
+    border-color: var(--error);
+    transform: translateY(-2px);
+}
+
+/* Pulse animation for 'Add New Service' */
+.pulse-btn {
+    animation: pulse 2s infinite;
+    padding: 1.2rem 2.5rem;
+    font-size: 1.2rem;
+    border-radius: 50px;
+}
+
+@keyframes pulse {
+    0% {
+        box-shadow: 0 0 0 0 rgba(210, 145, 188, 0.7);
+    }
+    70% {
+        box-shadow: 0 0 0 15px rgba(210, 145, 188, 0);
+    }
+    100% {
+        box-shadow: 0 0 0 0 rgba(210, 145, 188, 0);
+    }
+}
+
+/* Auth Nav Links tweaks */
+@media (max-width: 768px) {
+    .logout-btn {
+        margin-top: 1rem;
+        align-self: flex-start;
+        width: 100%;
+        justify-content: center;
+    }
+}
