@@ -52,3 +52,109 @@
         justify-content: center;
     }
 }
+
+/* Table Styles - Override pale styles for better visibility */
+table { width: 100%; border-collapse: collapse; margin-top: 1rem; background: #ffffff; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.05); color: #2C3E50; }
+th, td { padding: 1rem 1.5rem; text-align: left; }
+th { background: #f8f9fa; font-weight: 700; color: var(--primary); border-bottom: 2px solid #eee; }
+td { border-bottom: 1px solid #eee; }
+tr:last-child td { border-bottom: none; }
+
+.add-head { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; }
+
+.admin-action-btn { background: none; border: none; cursor: pointer; padding: 0.5rem; margin: 0 0.2rem; border-radius: 4px; font-weight: 600; font-family: inherit; transition: all 0.2s; }
+.edit-btn { color: var(--primary); }
+.edit-btn:hover { background: rgba(26, 82, 118, 0.1); }
+.delete-btn { color: var(--error); }
+.delete-btn:hover { background: rgba(255, 71, 87, 0.1); }
+.view-btn { color: #1e90ff; border: 1px solid transparent; }
+.view-btn:hover { background: rgba(30, 144, 255, 0.1); }
+.approve-btn { color: #2ed573; }
+.approve-btn:hover { background: rgba(46, 213, 115, 0.1); }
+.reject-btn { color: var(--error); }
+.reject-btn:hover { background: rgba(255, 71, 87, 0.1); }
+
+.status-badge { padding: 0.4rem 0.8rem; border-radius: 20px; font-size: 0.85rem; font-weight: 600; display: inline-flex; align-items: center; gap: 0.4rem; }
+.status-pending { background: #fff3cd; color: #856404; }
+.status-approved, .status-completed { background: #d4edda; color: #155724; }
+.status-arriving { background: #cce5ff; color: #004085; }
+
+/* Modal Styles */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(11, 61, 89, 0.8);
+    backdrop-filter: blur(5px);
+    align-items: center;
+    justify-content: center;
+}
+
+.modal.show {
+    display: flex;
+}
+
+.modal-content {
+    background-color: var(--bg);
+    margin: auto;
+    padding: 2.5rem;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    width: 90%;
+    max-width: 500px;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.6);
+    position: relative;
+    color: var(--text);
+}
+
+.close-btn {
+    color: var(--text-muted);
+    position: absolute;
+    top: 1rem;
+    right: 1.5rem;
+    font-size: 28px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.close-btn:hover,
+.close-btn:focus {
+    color: var(--error);
+    text-decoration: none;
+}
+
+.form-group {
+    margin-bottom: 1.5rem;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 0.5rem;
+    color: var(--text);
+    font-weight: 500;
+}
+
+.form-group input, 
+.form-group select {
+    width: 100%;
+    padding: 1rem;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: var(--card-bg);
+    color: var(--text);
+    font-family: inherit;
+    font-size: 1rem;
+}
+
+.form-group input:focus,
+.form-group select:focus {
+    outline: none;
+    border-color: var(--secondary);
+    box-shadow: 0 0 0 2px rgba(210, 145, 188, 0.2);
+}

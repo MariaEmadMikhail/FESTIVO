@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Festivo | Manage Products</title>
+    <!-- Use the existing homepage styles, along with custom overrides for the dashboard -->
+    <link rel="stylesheet" href="../home%20page/styles.css">
+    <link rel="stylesheet" href="admin.css">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+</head>
+<body>
+    <div class="background-shapes">
+        <div class="shape shape-1"></div><div class="shape shape-2"></div><div class="shape shape-3"></div>
+    </div>
+
+    <!-- Admin Navigation Bar -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="index.html" class="nav-logo">
+                <img src="../logo.png" alt="Festivo" style="height: 40px; vertical-align: middle;">
+            </a>
+            
+            <div class="nav-links" id="navLinks">
+                <a href="index.html">Dashboard</a>
+                <a href="products.html" class="active">Products</a>
+                <a href="submissions.html">Submissions</a>
+                <a href="orders.html">Orders</a>
+                <a href="occasions.html">Occasions</a>
+                
+                <a href="../home%20page/index.html" class="logout-btn">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 5px; vertical-align: text-bottom;"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
+                    Logout
+                </a>
+            </div>
+
+            <button class="menu-toggle" id="mobileMenuBtn">
+                <span></span><span></span><span></span>
+            </button>
+        </div>
+    </nav>
+
+    <main>
+        <section class="section-container" style="margin-top: 80px; padding-bottom: 50px;">
+            <div class="add-head">
+                <h1 class="section-title" style="text-align: left; margin: 0;">Manage Products</h1>
+                <button class="primary-btn" id="openAddProductModal">
+                    + Add New Product
+                </button>
+            </div>
+            <p style="color: var(--text-muted); margin-bottom: 2rem;">Create, edit, or remove decoration items.</p>
+            
+            <div style="overflow-x: auto;">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Icon</th>
+                            <th>Name</th>
+                            <th>Category</th>
+                            <th>Price</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td style="font-size: 1.5rem;">🎈</td>
+                            <td>Balloon Set A</td>
+                            <td>Balloons</td>
+                            <td>$15.00</td>
+                            <td>
+                                <button class="admin-action-btn edit-btn">Edit</button>
+                                <button class="admin-action-btn delete-btn">Delete</button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td style="font-size: 1.5rem;">🪑</td>
+                            <td>Table/Chair Set</td>
+                            <td>Chairs and Tables</td>
+                            <td>$50.00</td>
+                            <td>
+                                <button class="admin-action-btn edit-btn">Edit</button>
+                                <button class="admin-action-btn delete-btn">Delete</button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    </main>
+
+    <script>
+        document.getElementById('mobileMenuBtn').addEventListener('click', function() {
+            document.getElementById('navLinks').classList.toggle('active');
+            this.classList.toggle('open');
+        });
+        
+        document.querySelector('.logout-btn').addEventListener('click', function(e) {
+            e.preventDefault();
+            if(confirm('Are you sure you want to log out?')) {
+                window.location.href = this.getAttribute('href');
+            }
+        });
+
+        // Add Product Modal Logic
+        const addProductModal = document.getElementById('addProductModal');
+        const openAddProductModalBtn = document.getElementById('openAddProductModal');
+        const closeAddProductModalBtn = document.getElementById('closeAddProductModal');
+        const addProductForm = document.getElementById('addProductForm');
+        const productsTableBody = document.querySelector('table tbody');
+
+        openAddProductModalBtn.onclick = function() {
+            addProductModal.classList.add('show');
+        }
+
+        closeAddProductModalBtn.onclick = function() {
+            addProductModal.classList.remove('show');
+        }
+
+        window.onclick = function(event) {
+            if (event.target == addProductModal) {
+                addProductModal.classList.remove('show');
+            }
+        }
+
+        addProductForm.onsubmit = function(e) {
+            e.preventDefault();
+            const icon = document.getElementById('productIcon').value;
+            const name = document.getElementById('productName').value;
+            const category = document.getElementById('productCategory').value;
+            const price = document.getElementById('productPrice').value;
+
+            const newRow = document.createElement('tr');
+            newRow.innerHTML = `
+                <td style="font-size: 1.5rem;">${icon}</td>
+                <td>${name}</td>
+                <td>${category}</td>
+                <td>${price}</td>
+                <td>
+                    <button class="admin-action-btn edit-btn">Edit</button>
+                    <button class="admin-action-btn delete-btn">Delete</button>
+                </td>
+            `;
+
+            productsTableBody.appendChild(newRow);
+            
+            addProductModal.classList.remove('show');
+            addProductForm.reset();
+        }
+    </script>
+    <!-- Add Product Modal -->
+    <div id="addProductModal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn" id="closeAddProductModal">&times;</span>
+            <h2 class="section-title" style="margin-bottom: 1.5rem; font-size: 1.8rem; text-align: left;">Add New Product</h2>
+            <form id="addProductForm">
+                <div class="form-group">
+                    <label for="productIcon">Icon (Emoji)</label>
+                    <input type="text" id="productIcon" required placeholder="e.g. 🎈">
+                </div>
+                <div class="form-group">
+                    <label for="productName">Product Name</label>
+                    <input type="text" id="productName" required placeholder="e.g. Balloon Set B">
+                </div>
+                <div class="form-group">
+                    <label for="productCategory">Category</label>
+                    <input type="text" id="productCategory" required placeholder="e.g. Balloons">
+                </div>
+                <div class="form-group">
+                    <label for="productPrice">Price</label>
+                    <input type="text" id="productPrice" required placeholder="e.g. $20.00">
+                </div>
+                <button type="submit" class="primary-btn" style="width: 100%; margin-top: 1rem;">Save Product</button>
+            </form>
+        </div>
+    </div>
+</body>
+</html>

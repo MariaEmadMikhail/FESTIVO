@@ -171,6 +171,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Error detection
         if (password === 'wrong' || password.length < 4 || username === 'wrong') {
+            loginError.innerText = "Invalid credentials. Please try again.";
             loginError.classList.add('show');
             loginUsernameInput.classList.add('invalid');
             loginPasswordInput.classList.add('invalid');
@@ -178,6 +179,18 @@ document.addEventListener('DOMContentLoaded', () => {
             loginForm.classList.add('shake');
             setTimeout(() => loginForm.classList.remove('shake'), 400);
             return;
+        }
+
+        if (isAdmin) {
+            if (username !== 'festivo26' && username !== 'nourmmmr') {
+                loginError.innerText = "Access denied. Only authorized administrators can login.";
+                loginError.classList.add('show');
+                loginUsernameInput.classList.add('invalid');
+                loginPasswordInput.classList.add('invalid');
+                loginForm.classList.add('shake');
+                setTimeout(() => loginForm.classList.remove('shake'), 400);
+                return;
+            }
         }
 
         // Success Path

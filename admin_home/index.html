@@ -25,9 +25,11 @@
             </a>
             
             <div class="nav-links" id="navLinks">
-                <a href="index.html" class="active">HOME</a>
-                <a href="#users">Manage Users</a>
-                <a href="#providers">Manage Providers</a>
+                <a href="index.html" class="active">Dashboard</a>
+                <a href="products.html">Products</a>
+                <a href="submissions.html">Submissions</a>
+                <a href="orders.html">Orders</a>
+                <a href="occasions.html">Occasions</a>
                 
                 <!-- Logout -->
                 <a href="../home%20page/index.html" class="logout-btn">
@@ -46,46 +48,39 @@
     </nav>
 
     <main>
-        <!-- Hero Section for Admin -->
-        <section class="hero" id="home">
-            <div class="hero-content">
-                <!-- Placeholder for Logo Picture -->
-                <div class="hero-logo-container">
-                    <img src="../logo.png" alt="Festivo Logo" class="hero-logo">
+        <section class="section-container" style="margin-top: 80px; padding-bottom: 50px;">
+            <h1 class="section-title" style="text-align: left;">Dashboard Overview</h1>
+            <p style="color: var(--text-muted); margin-bottom: 2rem;">Welcome to the Festivo Admin Portal.</p>
+            
+            <div class="about-grid" style="grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.5rem;">
+                <div class="about-card" style="padding: 2rem; border-top: 4px solid var(--primary);">
+                    <div style="font-size: 2.5rem; margin-bottom: 0.5rem; color: var(--primary);">👥</div>
+                    <h3 style="margin-bottom: 0;">Total Users</h3>
+                    <div style="font-size: 2rem; font-weight: 700; color: var(--secondary);">1,245</div>
                 </div>
                 
-                <h1 class="hero-title">Admin Dashboard <span style="display:block; font-size: 2rem; color: var(--secondary); margin-top: 10px;">Manage users, providers, and platform settings.</span></h1>
+                <div class="about-card" style="padding: 2rem; border-top: 4px solid #1dd1a1;">
+                    <div style="font-size: 2.5rem; margin-bottom: 0.5rem; color: #1dd1a1;">💼</div>
+                    <h3 style="margin-bottom: 0;">Total Providers</h3>
+                    <div style="font-size: 2rem; font-weight: 700; color: var(--secondary);">156</div>
+                </div>
+
+                <div class="about-card" style="padding: 2rem; border-top: 4px solid #ff9f43;">
+                    <div style="font-size: 2.5rem; margin-bottom: 0.5rem; color: #ff9f43;">📝</div>
+                    <h3 style="margin-bottom: 0;">Pending Submissions</h3>
+                    <div style="font-size: 2rem; font-weight: 700; color: var(--secondary);">12</div>
+                </div>
                 
-                <div class="hero-cta" style="margin-top: 2rem;">
-                    <a href="#users" class="primary-btn pulse-btn">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 8px;"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
-                        Manage Users
-                    </a>
+                <div class="about-card" style="padding: 2rem; border-top: 4px solid var(--accent);">
+                    <div style="font-size: 2.5rem; margin-bottom: 0.5rem; color: var(--accent);">🛒</div>
+                    <h3 style="margin-bottom: 0;">Total Orders</h3>
+                    <div style="font-size: 2rem; font-weight: 700; color: var(--secondary);">3,489</div>
                 </div>
             </div>
-        </section>
-
-        <!-- About Us Section (Reused from Main Home) -->
-        <section class="about-section" id="about">
-            <div class="section-container">
-                <h2 class="section-title">About Festivo</h2>
-                <div class="about-grid">
-                    <div class="about-card">
-                        <div class="card-icon">🎉</div>
-                        <h3>Our Mission</h3>
-                        <p>We aim to take the stress out of event planning. Whether it's a cozy birthday party or a massive corporate gathering, Festivo connects you with the best tools and providers in the industry.</p>
-                    </div>
-                    <div class="about-card">
-                        <div class="card-icon">🤝</div>
-                        <h3>For Customers</h3>
-                        <p>Discover top-rated venues, skilled caterers, and talented entertainers all in one place. Manage your guest list, send invites, and track your budget seamlessly through our dashboard.</p>
-                    </div>
-                    <div class="about-card">
-                        <div class="card-icon">💼</div>
-                        <h3>For Providers</h3>
-                        <p>Grow your event business by showcasing your services directly to clients actively planning their occasions. Manage bookings, receive payments securely, and build your reputation.</p>
-                    </div>
-                </div>
+            
+            <h2 class="section-title" style="text-align: left; margin-top: 4rem;">System Status</h2>
+            <div style="background: white; border-radius: 12px; padding: 2rem; box-shadow: 0 4px 15px rgba(0,0,0,0.05); text-align: center;">
+                <p style="color: var(--text-muted); font-size: 1.1rem;">All systems are nominal. Navigate through the top bar to manage platform constraints.</p>
             </div>
         </section>
         

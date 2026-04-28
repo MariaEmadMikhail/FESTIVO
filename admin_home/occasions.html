@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Festivo | Manage Occasions</title>
+    <!-- Use the existing homepage styles, along with custom overrides for the dashboard -->
+    <link rel="stylesheet" href="../home%20page/styles.css">
+    <link rel="stylesheet" href="admin.css">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+</head>
+<body>
+    <div class="background-shapes">
+        <div class="shape shape-1"></div><div class="shape shape-2"></div><div class="shape shape-3"></div>
+    </div>
+
+    <!-- Admin Navigation Bar -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="index.html" class="nav-logo">
+                <img src="../logo.png" alt="Festivo" style="height: 40px; vertical-align: middle;">
+            </a>
+            
+            <div class="nav-links" id="navLinks">
+                <a href="index.html">Dashboard</a>
+                <a href="products.html">Products</a>
+                <a href="submissions.html">Submissions</a>
+                <a href="orders.html">Orders</a>
+                <a href="occasions.html" class="active">Occasions</a>
+                
+                <a href="../home%20page/index.html" class="logout-btn">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 5px; vertical-align: text-bottom;"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
+                    Logout
+                </a>
+            </div>
+
+            <button class="menu-toggle" id="mobileMenuBtn">
+                <span></span><span></span><span></span>
+            </button>
+        </div>
+    </nav>
+
+    <main>
+        <section class="section-container" style="margin-top: 80px; padding-bottom: 50px;">
+            <div class="add-head">
+                <h1 class="section-title" style="text-align: left; margin: 0;">Manage Occasions</h1>
+                <button class="primary-btn" id="openAddOccasionModal">
+                    + Add New Occasion
+                </button>
+            </div>
+            <p style="color: var(--text-muted); margin-bottom: 2rem;">Customize occasions presented to customers.</p>
+            
+            <div style="overflow-x: auto;">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Icon</th>
+                            <th>Occasion Name</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td style="font-size: 1.5rem;">🎂</td>
+                            <td><strong>Birthdays</strong></td>
+                            <td style="color: var(--success); font-weight: 500;">Active</td>
+                            <td>
+                                <button class="admin-action-btn edit-btn">Edit</button>
+                                <button class="admin-action-btn delete-btn">Delete</button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td style="font-size: 1.5rem;">🌙</td>
+                            <td><strong>Seasonal Options</strong></td>
+                            <td style="color: var(--success); font-weight: 500;">Active</td>
+                            <td>
+                                <button class="admin-action-btn edit-btn">Edit</button>
+                                <button class="admin-action-btn delete-btn">Delete</button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    </main>
+
+    <script>
+        document.getElementById('mobileMenuBtn').addEventListener('click', function() {
+            document.getElementById('navLinks').classList.toggle('active');
+            this.classList.toggle('open');
+        });
+        
+        document.querySelector('.logout-btn').addEventListener('click', function(e) {
+            e.preventDefault();
+            if(confirm('Are you sure you want to log out?')) {
+                window.location.href = this.getAttribute('href');
+            }
+        });
+
+        // Add Occasion Modal Logic
+        const addOccasionModal = document.getElementById('addOccasionModal');
+        const openAddOccasionModalBtn = document.getElementById('openAddOccasionModal');
+        const closeAddOccasionModalBtn = document.getElementById('closeAddOccasionModal');
+        const addOccasionForm = document.getElementById('addOccasionForm');
+        const occasionsTableBody = document.querySelector('table tbody');
+
+        openAddOccasionModalBtn.onclick = function() {
+            addOccasionModal.classList.add('show');
+        }
+
+        closeAddOccasionModalBtn.onclick = function() {
+            addOccasionModal.classList.remove('show');
+        }
+
+        window.onclick = function(event) {
+            if (event.target == addOccasionModal) {
+                addOccasionModal.classList.remove('show');
+            }
+        }
+
+        addOccasionForm.onsubmit = function(e) {
+            e.preventDefault();
+            const icon = document.getElementById('occasionIcon').value;
+            const name = document.getElementById('occasionName').value;
+            const status = document.getElementById('occasionStatus').value;
+
+            const statusColor = status === 'Active' ? 'var(--success)' : 'var(--error)';
+
+            const newRow = document.createElement('tr');
+            newRow.innerHTML = `
+                <td style="font-size: 1.5rem;">${icon}</td>
+                <td><strong>${name}</strong></td>
+                <td style="color: ${statusColor}; font-weight: 500;">${status}</td>
+                <td>
+                    <button class="admin-action-btn edit-btn">Edit</button>
+                    <button class="admin-action-btn delete-btn">Delete</button>
+                </td>
+            `;
+
+            occasionsTableBody.appendChild(newRow);
+            
+            addOccasionModal.classList.remove('show');
+            addOccasionForm.reset();
+        }
+    </script>
+    <!-- Add Occasion Modal -->
+    <div id="addOccasionModal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn" id="closeAddOccasionModal">&times;</span>
+            <h2 class="section-title" style="margin-bottom: 1.5rem; font-size: 1.8rem; text-align: left;">Add New Occasion</h2>
+            <form id="addOccasionForm">
+                <div class="form-group">
+                    <label for="occasionIcon">Icon (Emoji)</label>
+                    <input type="text" id="occasionIcon" required placeholder="e.g. 💍">
+                </div>
+                <div class="form-group">
+                    <label for="occasionName">Occasion Name</label>
+                    <input type="text" id="occasionName" required placeholder="e.g. Wedding">
+                </div>
+                <div class="form-group">
+                    <label for="occasionStatus">Status</label>
+                    <select id="occasionStatus" required>
+                        <option value="Active">Active</option>
+                        <option value="Inactive">Inactive</option>
+                    </select>
+                </div>
+                <button type="submit" class="primary-btn" style="width: 100%; margin-top: 1rem;">Save Occasion</button>
+            </form>
+        </div>
+    </div>
+</body>
+</html>
