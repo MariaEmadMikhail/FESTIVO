@@ -1,3 +1,12 @@
+<?php
+session_start();
+
+if (!isset($_SESSION["username"])) {
+    header("Location: ../Login Page/login.html");
+    exit();
+}
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -5,8 +14,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Festivo | Cake & Catering</title>
-    <link rel="stylesheet" href="../home%20page/styles.css">
-    <link rel="stylesheet" href="customer.css">
+    <link rel="stylesheet" href="/FESTIVO/home%20page/styles.css">
+    <link rel="stylesheet" href="/FESTIVO/customer_home/customer.css">
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap"
         rel="stylesheet">
 </head>
@@ -23,14 +32,14 @@
     <nav class="navbar">
         <div class="nav-container">
             <a href="index.php" class="nav-logo">
-                <img src="../logo.png" alt="Festivo" style="height: 40px; vertical-align: middle;">
+                <img src="/FESTIVO/logo.png" alt="Festivo" style="height: 40px; vertical-align: middle;">
             </a>
 
             <div class="nav-links" id="navLinks">
                 <a href="index.php">HOME</a>
                 <a href="occasions.php">Occasions</a>
                 <a href="products.html">Products</a>
-                <a href="catering.html" class="active">Catering</a>
+                <a href="catering.php" class="active">Catering</a>
 
                 <a href="checkout.html" class="cart-icon" title="My Cart">
                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"

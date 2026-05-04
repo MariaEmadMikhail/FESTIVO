@@ -16,8 +16,8 @@ if (!isset($_SESSION["username"])) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Festivo | Choose Your Occasion</title>
-    <link rel="stylesheet" href="../home%20page/styles.css">
-    <link rel="stylesheet" href="customer.css">
+    <link rel="stylesheet" href="/FESTIVO/home%20page/styles.css">
+    <link rel="stylesheet" href="/FESTIVO/customer_home/customer.css">
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap"
         rel="stylesheet">
 </head>
@@ -34,13 +34,13 @@ if (!isset($_SESSION["username"])) {
     <nav class="navbar">
         <div class="nav-container">
             <a href="index.php" class="nav-logo">
-                <img src="../logo.png" alt="Festivo" style="height: 40px; vertical-align: middle;">
+                <img src="/FESTIVO/logo.png" alt="Festivo" style="height: 40px; vertical-align: middle;">
             </a>
 
             <div class="nav-links" id="navLinks">
                 <a href="index.php">HOME</a>
                 <a href="occasions.php" class="active">Occasions</a>
-                <a href="index.php">My Orders</a>
+                <a href="index.php#orders">My Orders</a>
 
                 <!-- Cart Icon -->
                 <a href="#cart" class="cart-icon" title="My Cart">
@@ -267,7 +267,7 @@ if (!isset($_SESSION["username"])) {
                 duration: selectedDuration
             };
             localStorage.setItem('festivoEvent', JSON.stringify(eventData));
-            alert('Your selection has been saved!\n\nOccasion: ' + eventData.occasion + '\nDate: ' + eventData.date + '\nStart Time: ' + eventData.startTime + '\nDuration: ' + eventData.duration);
+            window.location.href = "products.html";
         });
     </script>
 </body>

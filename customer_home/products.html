@@ -5,8 +5,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Festivo | Select Decor & Items</title>
-    <link rel="stylesheet" href="../home%20page/styles.css">
-    <link rel="stylesheet" href="customer.css">
+    <link rel="stylesheet" href="/FESTIVO/home%20page/styles.css">
+    <link rel="stylesheet" href="/FESTIVO/customer_home/customer.css">
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap"
         rel="stylesheet">
 </head>
@@ -23,7 +23,7 @@
     <nav class="navbar">
         <div class="nav-container">
             <a href="index.php" class="nav-logo">
-                <img src="../logo.png" alt="Festivo" style="height: 40px; vertical-align: middle;">
+                <img src="/FESTIVO/logo.png" alt="Festivo" style="height: 40px; vertical-align: middle;">
             </a>
 
             <div class="nav-links" id="navLinks">
@@ -63,7 +63,7 @@
 
     <main style="margin-top: 80px; padding-bottom: 120px;">
         <div class="section-container" style="padding-bottom: 0;">
-            <a href="occasions.html" class="back-btn">
+            <a href="occasions.php" class="back-btn">
                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
                 Back to Occasions
             </a>
@@ -345,7 +345,7 @@
 
         checkoutBtn.innerText = 'Next: Cake & Catering';
         checkoutBtn.addEventListener('click', () => {
-             window.location.href = 'catering.html';
+             window.location.href = 'catering.php';
         });
 
         init();

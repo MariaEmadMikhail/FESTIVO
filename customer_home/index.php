@@ -16,8 +16,8 @@ if (!isset($_SESSION["username"])) {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Festivo | Customer Dashboard</title>
     <!-- Use the existing homepage styles, along with custom overrides for the dashboard -->
-    <link rel="stylesheet" href="../home%20page/styles.css">
-    <link rel="stylesheet" href="customer.css">
+    <link rel="stylesheet" href="/FESTIVO/home%20page/styles.css">
+    <link rel="stylesheet" href="/FESTIVO/customer_home/customer.css">
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap"
         rel="stylesheet">
 </head>
@@ -34,7 +34,7 @@ if (!isset($_SESSION["username"])) {
     <nav class="navbar">
         <div class="nav-container">
             <a href="index.php" class="nav-logo">
-                <img src="../logo.png" alt="Festivo" style="height: 40px; vertical-align: middle;">
+                <img src="/FESTIVO/logo.png" alt="Festivo" style="height: 40px; vertical-align: middle;">
             </a>
 
             <div class="nav-links" id="navLinks">
@@ -163,6 +163,14 @@ if (!isset($_SESSION["username"])) {
                 </div>
             </div>
         </section>
+
+        <section id="orders">
+    <div class="section-container">
+        <h2 class="section-title">My Orders</h2>
+        <p style="text-align:center;">Your orders will appear here.</p>
+    </div>
+</section>
+
     </main>
 
     <!-- Footer (Identical to Main Home) -->
