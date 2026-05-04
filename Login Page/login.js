@@ -58,22 +58,27 @@ if (params.get("error") === "1") {
     }
 
     form.addEventListener('submit', (e) => {
-
-    const username = usernameInput.value.trim();
-    const password = passwordInput.value;
-
-    // If fields are empty → block submission
-    if (!username || !password) {
         e.preventDefault();
+        const username = usernameInput.value.trim();
+        const password = passwordInput.value;
 
-        if (!username) usernameInput.classList.add('invalid');
-        if (!password) passwordInput.classList.add('invalid');
+        if (!username || !password) {
+            if (!username) usernameInput.classList.add('invalid');
+            if (!password) passwordInput.classList.add('invalid');
+            return;
+        }
 
-        return;
-    }
+        if (password === 'wrong' || password.length < 4 || username === 'wrong') {
+            loginError.classList.add('show');
+            usernameInput.classList.add('invalid');
+            passwordInput.classList.add('invalid');
+            form.classList.add('shake');
+            setTimeout(() => form.classList.remove('shake'), 400);
+            return;
+        }
 
-    // If filled → DO NOTHING → allow form to go to PHP
-});
+        startVerificationStep(false);
+    });
 
     adminLoginBtn.addEventListener('click', (e) => {
         e.preventDefault();
@@ -109,4 +114,113 @@ if (params.get("error") === "1") {
         passwordInput.classList.remove('invalid');
         loginError.classList.remove('show');
     });
+
+    const otpCodeInput = document.getElementById('otpCode');
+    if(otpCodeInput) {
+        otpCodeInput.addEventListener('input', () => {
+            otpCodeInput.classList.remove('invalid');
+            loginError.classList.remove('show');
+        });
+    }
+
+    // 2FA VERIFICATION LOGIC
+    const socialBox = document.getElementById('socialBox');
+    const otpVerificationStep = document.getElementById('otpVerificationStep');
+    const otpSelectionGroup = document.getElementById('otpSelectionGroup');
+    const otpInputGroup = document.getElementById('otpInputGroup');
+    const requestOtpBtn = document.getElementById('requestOtpBtn');
+    const verifyOtpBtn = document.getElementById('verifyOtpBtn');
+    const resendCodeLink = document.getElementById('resendCodeLink');
+    const otpMethodRadios = document.querySelectorAll('input[name="otpMethod"]');
+    const verificationCodeInput = document.getElementById('verificationCode');
+    const verificationError = document.getElementById('verificationError');
+
+    let isAdminLogin = false;
+
+    function startVerificationStep(admin) {
+        isAdminLogin = admin;
+        form.style.display = 'none';
+        if(socialBox) socialBox.style.display = 'none';
+        if(otpVerificationStep) otpVerificationStep.style.display = 'block';
+    }
+
+    const googleLoginBtn = document.getElementById('googleLoginBtn');
+    if (googleLoginBtn) {
+        googleLoginBtn.addEventListener('click', () => {
+            const btnOriginal = googleLoginBtn.innerHTML;
+            googleLoginBtn.innerHTML = 'Authenticating...';
+            setTimeout(() => {
+                googleLoginBtn.innerHTML = btnOriginal;
+                startVerificationStep(false);
+            }, 800);
+        });
+    }
+
+    if (otpMethodRadios.length > 0) {
+        otpMethodRadios.forEach(radio => {
+            radio.addEventListener('change', (e) => {
+                otpMethodRadios.forEach(r => {
+                    r.parentElement.style.borderColor = 'var(--border)';
+                    r.parentElement.style.background = 'transparent';
+                });
+                if(e.target.checked) {
+                    e.target.parentElement.style.borderColor = 'var(--secondary)';
+                    e.target.parentElement.style.background = 'rgba(0, 206, 201, 0.1)';
+                }
+            });
+        });
+    }
+
+    if (requestOtpBtn) {
+        requestOtpBtn.addEventListener('click', () => {
+            const methodEl = document.querySelector('input[name="otpMethod"]:checked');
+            const method = methodEl ? methodEl.value : 'email';
+            requestOtpBtn.innerHTML = 'Sending...';
+            
+            setTimeout(() => {
+                otpSelectionGroup.style.display = 'none';
+                otpInputGroup.style.display = 'block';
+                alert(`Verification code sent via ${method.toUpperCase()}! (Use 123456)`);
+            }, 600);
+        });
+    }
+
+    if (verifyOtpBtn) {
+        verifyOtpBtn.addEventListener('click', () => {
+            const code = verificationCodeInput.value.trim();
+            if (code !== '123456') {
+                verificationError.style.display = 'block';
+                verificationCodeInput.classList.add('invalid');
+                return;
+            }
+            
+            verificationError.style.display = 'none';
+            verifyOtpBtn.innerHTML = 'Verifying... ✓';
+            verifyOtpBtn.style.background = 'var(--success)';
+            
+            setTimeout(() => {
+                if (isAdminLogin) {
+                    alert('Verified! Logged in successfully as Admin.');
+                    window.location.href = '../admin_home/index.html';
+                } else {
+                    alert('Verified! Logged in successfully.');
+                    window.location.href = '../customer_home/index.html';
+                }
+            }, 1000);
+        });
+    }
+
+    if (resendCodeLink) {
+        resendCodeLink.addEventListener('click', (e) => {
+            e.preventDefault();
+            alert('A new verification code has been sent!');
+        });
+    }
+    
+    if (verificationCodeInput) {
+        verificationCodeInput.addEventListener('input', () => {
+            verificationCodeInput.classList.remove('invalid');
+            verificationError.style.display = 'none';
+        });
+    }
 });
