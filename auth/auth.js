@@ -94,53 +94,27 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     signupForm.addEventListener('submit', (e) => {
+
+    const isFirstNameValid = validateField(firstName, firstNameError, nameRegex);
+    const isLastNameValid = validateField(lastName, lastNameError, nameRegex);
+    const isEmailValid = validateField(email, emailError, emailRegex);
+    const isPasswordValid = password.value.length > 0 && password.value.length <= 12;
+    const isConfirmPasswordValid = confirmPassword.value.length > 0 && password.value === confirmPassword.value;
+
+    if (!(isFirstNameValid && isLastNameValid && isEmailValid && isPasswordValid && isConfirmPasswordValid)) {
         e.preventDefault();
-        
-        const isFirstNameValid = validateField(firstName, firstNameError, nameRegex);
-        const isLastNameValid = validateField(lastName, lastNameError, nameRegex);
-        const isEmailValid = validateField(email, emailError, emailRegex);
-        const isPasswordValid = password.value.length > 0 && password.value.length <= 12;
-        const isConfirmPasswordValid = confirmPassword.value.length > 0 && password.value === confirmPassword.value;
 
-        if (isFirstNameValid && isLastNameValid && isEmailValid && isPasswordValid && isConfirmPasswordValid) {
-            // Success animation
-            const btn = document.getElementById('signupSubmitBtn');
-            const originalText = btn.innerHTML;
-            btn.innerHTML = 'Account Created! ✓';
-            btn.style.background = 'var(--success)';
-            
-            setTimeout(() => {
-                // Save the selected role for login redirect
-                const selectedRole = document.querySelector('input[name="role"]:checked').value;
-                localStorage.setItem('userRole', selectedRole);
+        validateField(firstName, firstNameError, nameRegex);
+        validateField(lastName, lastNameError, nameRegex);
+        validateField(email, emailError, emailRegex);
+        validateField(password, passwordError, null, () => password.value.length > 0 && password.value.length <= 12);
+        validateField(confirmPassword, confirmPasswordError, null, () => password.value === confirmPassword.value);
 
-                alert('Sign up successful! Please log in with your new credentials.');
-                // Switch to login screen!
-                signupSection.classList.add('hidden');
-                loginSection.classList.remove('hidden');
-                
-                // Reset styling
-                btn.innerHTML = originalText;
-                btn.style.background = '';
-                signupForm.reset(); // clear form
-                
-                // Clear validation outlines
-                const inputs = signupForm.querySelectorAll('input');
-                inputs.forEach(i => { i.classList.remove('valid', 'invalid'); });
-                
-            }, 800);
-        } else {
-            // Force show errors if empty
-            validateField(firstName, firstNameError, nameRegex);
-            validateField(lastName, lastNameError, nameRegex);
-            validateField(email, emailError, emailRegex);
-            validateField(password, passwordError, null, () => password.value.length > 0 && password.value.length <= 12);
-            validateField(confirmPassword, confirmPasswordError, null, () => password.value === confirmPassword.value);
-            
-            signupForm.classList.add('shake');
-            setTimeout(() => signupForm.classList.remove('shake'), 400);
-        }
-    });
+        signupForm.classList.add('shake');
+        setTimeout(() => signupForm.classList.remove('shake'), 400);
+    }
+
+});
 
 
     /* =========================================

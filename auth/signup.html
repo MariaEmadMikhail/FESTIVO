@@ -24,16 +24,16 @@
                 <p>Join the ultimate event planning experience</p>
             </div>
             
-            <form id="signup-form">
+            <form id="signup-form" action="/FESTIVO/backend/signup.php" method="POST">
                 <div class="form-row">
                     <div class="input-group">
                         <label for="firstName">First Name</label>
-                        <input type="text" id="firstName" name="firstName" placeholder="John" required>
+                        <input type="text" id="firstName" name="first_name" placeholder="John" required>
                         <span class="error" id="firstNameError">Letters only</span>
                     </div>
                     <div class="input-group">
                         <label for="lastName">Last Name</label>
-                        <input type="text" id="lastName" name="lastName" placeholder="Doe" required>
+                        <input type="text" id="lastName" name="last_name" placeholder="Doe" required>
                         <span class="error" id="lastNameError">Letters only</span>
                     </div>
                 </div>

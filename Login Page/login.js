@@ -1,4 +1,10 @@
 document.addEventListener('DOMContentLoaded', () => {
+    // Check if there is an error in URL
+const params = new URLSearchParams(window.location.search);
+if (params.get("error") === "1") {
+    const loginError = document.getElementById("loginError");
+    loginError.classList.add("show");
+    }
     const form = document.getElementById('login-form');
     const usernameInput = document.getElementById('username');
     const passwordInput = document.getElementById('password');
@@ -48,27 +54,26 @@ document.addEventListener('DOMContentLoaded', () => {
             btn.style.background = 'var(--success)';
         }
         
-        setTimeout(() => {
-            // Route to appropriate dashboard
-            if (isAdmin) {
-                alert('Logged in successfully as Admin! Welcome back to Festivo.');
-                window.location.href = '../admin_home/index.html';
-            } else {
-                const storedRole = localStorage.getItem('userRole') || 'customer';
-                alert(`Logged in successfully as ${storedRole === 'provider' ? 'Provider' : 'Customer'}! Welcome back to Festivo.`);
-                if (storedRole === 'provider') {
-                    window.location.href = '../provider_home/index.html';
-                } else {
-                    window.location.href = '../customer_home/index.html';
-                }
-            }
-        }, 1000);
+        
     }
 
     form.addEventListener('submit', (e) => {
+
+    const username = usernameInput.value.trim();
+    const password = passwordInput.value;
+
+    // If fields are empty → block submission
+    if (!username || !password) {
         e.preventDefault();
-        handleLogin(false); // User login
-    });
+
+        if (!username) usernameInput.classList.add('invalid');
+        if (!password) passwordInput.classList.add('invalid');
+
+        return;
+    }
+
+    // If filled → DO NOTHING → allow form to go to PHP
+});
 
     adminLoginBtn.addEventListener('click', (e) => {
         e.preventDefault();

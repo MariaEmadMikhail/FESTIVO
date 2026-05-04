@@ -1,3 +1,13 @@
+<?php
+session_start();
+
+if (!isset($_SESSION["username"])) {
+    header("Location: ../Login Page/login.html");
+    exit();
+}
+?>
+
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -23,14 +33,18 @@
     <!-- Logged-in Navigation Bar -->
     <nav class="navbar">
         <div class="nav-container">
-            <a href="index.html" class="nav-logo">
+            <a href="index.php" class="nav-logo">
                 <img src="../logo.png" alt="Festivo" style="height: 40px; vertical-align: middle;">
             </a>
 
             <div class="nav-links" id="navLinks">
-                <a href="index.html" class="active">HOME</a>
-                <a href="occasions.html">Occasions</a>
+                <a href="index.php" class="active">HOME</a>
+                <a href="occasions.php">Occasions</a>
                 <a href="#orders">My Orders</a>
+
+                <span style="margin-left: 15px; font-weight: 500;">
+                    Welcome <?php echo $_SESSION["username"]; ?>
+                </span>
 
                 <!-- Cart Icon -->
                 <a href="#cart" class="cart-icon" title="My Cart">
@@ -44,7 +58,7 @@
                 </a>
 
                 <!-- Logout -->
-                <a href="../home%20page/index.html" class="logout-btn">
+                <a href="../backend/logout.php" class="logout-btn">
                     <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none"
                         stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
                         style="margin-right: 5px; vertical-align: text-bottom;">
@@ -80,7 +94,7 @@
 
                 <div class="hero-cta" style="margin-top: 2rem;">
                     <!-- 'Book your event' button stands out -->
-                    <a href="occasions.html" class="primary-btn pulse-btn">
+                    <a href="occasions.php" class="primary-btn pulse-btn">
                         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
                             stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
                             style="margin-right: 8px;">
@@ -145,7 +159,7 @@
                     </div>
                 </div>
                 <div style="text-align: center; margin-top: 3rem;">
-                    <a href="occasions.html" class="secondary-btn">View All & Book Now</a>
+                    <a href="occasions.php" class="secondary-btn">View All & Book Now</a>
                 </div>
             </div>
         </section>
@@ -214,4 +228,5 @@
     </script>
 </body>
 
-</html>
+</html>  
+

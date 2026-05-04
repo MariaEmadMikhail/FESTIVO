@@ -1,3 +1,14 @@
+<?php
+session_start();
+
+if (!isset($_SESSION["username"])) {
+    header("Location: ../Login Page/login.html");
+    exit();
+}
+?>
+
+
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -22,14 +33,14 @@
     <!-- Navigation Bar -->
     <nav class="navbar">
         <div class="nav-container">
-            <a href="index.html" class="nav-logo">
+            <a href="index.php" class="nav-logo">
                 <img src="../logo.png" alt="Festivo" style="height: 40px; vertical-align: middle;">
             </a>
 
             <div class="nav-links" id="navLinks">
-                <a href="index.html">HOME</a>
-                <a href="occasions.html" class="active">Occasions</a>
-                <a href="index.html#orders">My Orders</a>
+                <a href="index.php">HOME</a>
+                <a href="occasions.php" class="active">Occasions</a>
+                <a href="index.php">My Orders</a>
 
                 <!-- Cart Icon -->
                 <a href="#cart" class="cart-icon" title="My Cart">
@@ -43,7 +54,7 @@
                 </a>
 
                 <!-- Logout -->
-                <a href="../home%20page/index.html" class="logout-btn">
+                <a href="../backend/logout.php" class="logout-btn">
                     <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none"
                         stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
                         style="margin-right: 5px; vertical-align: text-bottom;">
