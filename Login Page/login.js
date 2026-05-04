@@ -28,9 +28,9 @@ if (params.get("error") === "1") {
             return;
         }
 
-        // Simulate authentication error for demonstration
-        // e.g., if you type "wrong" or a very short password, it shows the error
-        if (password === 'wrong' || password.length < 4 || username === 'wrong') {
+        // Simplified validation for testing purposes
+        // Only reject if it explicitly says 'wrong'
+        if (username.toLowerCase() === 'wrong' || password === 'wrong') {
             loginError.classList.add('show');
             usernameInput.classList.add('invalid');
             passwordInput.classList.add('invalid');

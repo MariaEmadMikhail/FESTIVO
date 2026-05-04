@@ -249,11 +249,18 @@
         // Next button — save and proceed
         nextBtn.addEventListener('click', () => {
             if (nextBtn.disabled) return;
+            
+            let hours = 1;
+            if (selectedDuration === "3 hours") hours = 3;
+            else if (selectedDuration === "6 hours") hours = 6;
+            else if (selectedDuration === "Full Day") hours = 12; // Or however many hours full day is
+
             const eventData = {
                 occasion: selectedOccasion,
                 date: dateInput.value,
                 startTime: timeInput.value,
-                duration: selectedDuration
+                duration: selectedDuration,
+                hours: hours
             };
             localStorage.setItem('festivoEvent', JSON.stringify(eventData));
             window.location.href = 'products.html';
