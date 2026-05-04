@@ -97,7 +97,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const isFirstNameValid = validateField(firstName, firstNameError, nameRegex);
     const isLastNameValid = validateField(lastName, lastNameError, nameRegex);
-    const isEmailValid = validateField(email, emailError, emailRegex);
     const isPasswordValid = password.value.length > 0 && password.value.length <= 12;
     const isConfirmPasswordValid = confirmPassword.value.length > 0 && password.value === confirmPassword.value;
 
@@ -112,8 +111,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
         signupForm.classList.add('shake');
         setTimeout(() => signupForm.classList.remove('shake'), 400);
+        return;
     }
 
+    e.preventDefault();
+    startSignupVerificationStep();
 });
 
 
@@ -196,10 +198,34 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }, 1000);
     }
-
+    
     loginForm.addEventListener('submit', (e) => {
         e.preventDefault();
-        handleLogin(false);
+        
+        const username = loginUsernameInput.value.trim();
+        const password = loginPasswordInput.value;
+
+        loginError.classList.remove('show');
+        loginUsernameInput.classList.remove('invalid');
+        loginPasswordInput.classList.remove('invalid');
+
+        if (!username || !password) {
+            if (!username) loginUsernameInput.classList.add('invalid');
+            if (!password) loginPasswordInput.classList.add('invalid');
+            return;
+        }
+
+        if (password === 'wrong' || password.length < 4 || username === 'wrong') {
+            loginError.innerText = "Invalid credentials. Please try again.";
+            loginError.classList.add('show');
+            loginUsernameInput.classList.add('invalid');
+            loginPasswordInput.classList.add('invalid');
+            loginForm.classList.add('shake');
+            setTimeout(() => loginForm.classList.remove('shake'), 400);
+            return;
+        }
+
+        startLoginVerificationStep(false);
     });
 
     adminLoginBtn.addEventListener('click', (e) => {
@@ -208,7 +234,7 @@ document.addEventListener('DOMContentLoaded', () => {
             loginForm.reportValidity();
             return;
         }
-        handleLogin(true);
+        startLoginVerificationStep(true);
     });
 
     forgotPasswordLink.addEventListener('click', (e) => {
@@ -234,4 +260,173 @@ document.addEventListener('DOMContentLoaded', () => {
         loginPasswordInput.classList.remove('invalid');
         loginError.classList.remove('show');
     });
+
+    // ==========================================
+    // 2FA VERIFICATION LOGIC FOR SIGNUP AND LOGIN
+    // ==========================================
+
+    // SIGNUP VERIFICATION ELEMENTS
+    const signupSocialBox = document.getElementById('signupSocialBox');
+    const signupOtpVerifStep = document.getElementById('signupOtpVerifStep');
+    const signupOtpSelGrp = document.getElementById('signupOtpSelGrp');
+    const signupOtpInpGrp = document.getElementById('signupOtpInpGrp');
+    const reqSignupOtpBtn = document.getElementById('reqSignupOtpBtn');
+    const verifySignupOtpBtn = document.getElementById('verifySignupOtpBtn');
+    const signupVerifyCode = document.getElementById('signupVerifyCode');
+    const signupVerifyError = document.getElementById('signupVerifyError');
+    const googleSignupBtn = document.getElementById('googleSignupBtn');
+    const resendSignupCodeLink = document.getElementById('resendSignupCodeLink');
+    const signupOtpMethodRadios = document.querySelectorAll('input[name="signupOtpMethod"]');
+
+    function startSignupVerificationStep() {
+        signupForm.style.display = 'none';
+        if(signupSocialBox) signupSocialBox.style.display = 'none';
+        if(signupOtpVerifStep) signupOtpVerifStep.style.display = 'block';
+    }
+
+    if (googleSignupBtn) {
+        googleSignupBtn.addEventListener('click', () => {
+            const temp = googleSignupBtn.innerHTML;
+            googleSignupBtn.innerHTML = 'Authenticating...';
+            setTimeout(() => {
+                googleSignupBtn.innerHTML = temp;
+                startSignupVerificationStep();
+            }, 800);
+        });
+    }
+
+    if (signupOtpMethodRadios.length > 0) {
+        signupOtpMethodRadios.forEach(radio => {
+            radio.addEventListener('change', (e) => {
+                signupOtpMethodRadios.forEach(r => {
+                    r.parentElement.style.borderColor = 'var(--border)';
+                    r.parentElement.style.background = 'transparent';
+                });
+                if(e.target.checked) {
+                    e.target.parentElement.style.borderColor = 'var(--secondary)';
+                    e.target.parentElement.style.background = 'rgba(0, 206, 201, 0.1)';
+                }
+            });
+        });
+    }
+
+    if (reqSignupOtpBtn) {
+        reqSignupOtpBtn.addEventListener('click', () => {
+            const checked = document.querySelector('input[name="signupOtpMethod"]:checked');
+            const method = checked ? checked.value : 'email';
+            reqSignupOtpBtn.innerHTML = 'Sending...';
+            setTimeout(() => {
+                signupOtpSelGrp.style.display = 'none';
+                signupOtpInpGrp.style.display = 'block';
+                alert(`Verification code sent via ${method.toUpperCase()}! (Use 123456)`);
+            }, 600);
+        });
+    }
+
+    if (verifySignupOtpBtn) {
+        verifySignupOtpBtn.addEventListener('click', () => {
+            if (signupVerifyCode.value.trim() !== '123456') {
+                signupVerifyCode.classList.add('invalid');
+                signupVerifyError.style.display = 'block';
+                return;
+            }
+            signupVerifyError.style.display = 'none';
+            verifySignupOtpBtn.innerHTML = 'Verifying... ✓';
+            verifySignupOtpBtn.style.background = 'var(--success)';
+            setTimeout(() => {
+                alert('Verified! Account created successfully.');
+                window.location.href = '../customer_home/index.html';
+            }, 1000);
+        });
+    }
+
+    if (resendSignupCodeLink) resendSignupCodeLink.addEventListener('click', (e) => { e.preventDefault(); alert("New code sent!"); });
+    if (signupVerifyCode) signupVerifyCode.addEventListener('input', () => { signupVerifyCode.classList.remove('invalid'); signupVerifyError.style.display = 'none'; });
+
+
+    // LOGIN VERIFICATION ELEMENTS
+    const loginSocialBox = document.getElementById('loginSocialBox');
+    const loginOtpVerifStep = document.getElementById('loginOtpVerifStep');
+    const loginOtpSelGrp = document.getElementById('loginOtpSelGrp');
+    const loginOtpInpGrp = document.getElementById('loginOtpInpGrp');
+    const reqLoginOtpBtn = document.getElementById('reqLoginOtpBtn');
+    const verifyLoginOtpBtn = document.getElementById('verifyLoginOtpBtn');
+    const loginVerifyCode = document.getElementById('loginVerifyCode');
+    const loginVerifyError = document.getElementById('loginVerifyError');
+    const googleLoginBtn = document.getElementById('googleLoginBtn');
+    const resendLoginCodeLink = document.getElementById('resendLoginCodeLink');
+    const loginOtpMethodRadios = document.querySelectorAll('input[name="loginOtpMethod"]');
+
+    let isAdminLoginFlow = false;
+
+    function startLoginVerificationStep(isAdmin) {
+        isAdminLoginFlow = isAdmin;
+        loginForm.style.display = 'none';
+        if(loginSocialBox) loginSocialBox.style.display = 'none';
+        if(loginOtpVerifStep) loginOtpVerifStep.style.display = 'block';
+    }
+
+    if (googleLoginBtn) {
+        googleLoginBtn.addEventListener('click', () => {
+            const temp = googleLoginBtn.innerHTML;
+            googleLoginBtn.innerHTML = 'Authenticating...';
+            setTimeout(() => {
+                googleLoginBtn.innerHTML = temp;
+                startLoginVerificationStep(false);
+            }, 800);
+        });
+    }
+
+    if (loginOtpMethodRadios.length > 0) {
+        loginOtpMethodRadios.forEach(radio => {
+            radio.addEventListener('change', (e) => {
+                loginOtpMethodRadios.forEach(r => {
+                    r.parentElement.style.borderColor = 'var(--border)';
+                    r.parentElement.style.background = 'transparent';
+                });
+                if(e.target.checked) {
+                    e.target.parentElement.style.borderColor = 'var(--secondary)';
+                    e.target.parentElement.style.background = 'rgba(0, 206, 201, 0.1)';
+                }
+            });
+        });
+    }
+
+    if (reqLoginOtpBtn) {
+        reqLoginOtpBtn.addEventListener('click', () => {
+            const checked = document.querySelector('input[name="loginOtpMethod"]:checked');
+            const method = checked ? checked.value : 'email';
+            reqLoginOtpBtn.innerHTML = 'Sending...';
+            setTimeout(() => {
+                loginOtpSelGrp.style.display = 'none';
+                loginOtpInpGrp.style.display = 'block';
+                alert(`Verification code sent via ${method.toUpperCase()}! (Use 123456)`);
+            }, 600);
+        });
+    }
+
+    if (verifyLoginOtpBtn) {
+        verifyLoginOtpBtn.addEventListener('click', () => {
+            if (loginVerifyCode.value.trim() !== '123456') {
+                loginVerifyCode.classList.add('invalid');
+                loginVerifyError.style.display = 'block';
+                return;
+            }
+            loginVerifyError.style.display = 'none';
+            verifyLoginOtpBtn.innerHTML = 'Verifying... ✓';
+            verifyLoginOtpBtn.style.background = 'var(--success)';
+            setTimeout(() => {
+                if (isAdminLoginFlow) {
+                    alert('Verified! Logged in successfully as Admin.');
+                    window.location.href = '../admin_home/index.html';
+                } else {
+                    alert('Verified! Logged in successfully.');
+                    window.location.href = '../customer_home/index.html';
+                }
+            }, 1000);
+        });
+    }
+
+    if (resendLoginCodeLink) resendLoginCodeLink.addEventListener('click', (e) => { e.preventDefault(); alert("New code sent!"); });
+    if (loginVerifyCode) loginVerifyCode.addEventListener('input', () => { loginVerifyCode.classList.remove('invalid'); loginVerifyError.style.display = 'none'; });
 });
