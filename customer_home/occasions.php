@@ -112,26 +112,24 @@ if (!isset($_SESSION["username"])) {
 
                 <!-- Date, Start Time & Duration Picker -->
                 <div class="event-details">
-                    <h3 class="event-details-title">Pick Your Date, Time & Duration</h3>
+                    <h3 class="event-details-title">Pick Your Date & Time Slot</h3>
                     <div class="event-details-row">
                         <div class="input-group">
                             <label for="eventDate">Event Date</label>
                             <input type="date" id="eventDate" class="event-input" />
                         </div>
-                        <div class="input-group">
-                            <label for="eventTime">Start Time</label>
-                            <input type="time" id="eventTime" class="event-input" />
+                        <div style="display: flex; gap: 1rem; flex: 1;">
+                            <div class="input-group" style="flex: 1;">
+                                <label for="timeFrom">From Time</label>
+                                <input type="time" id="timeFrom" class="event-input" />
+                            </div>
+                            <div class="input-group" style="flex: 1;">
+                                <label for="timeTo">To Time</label>
+                                <input type="time" id="timeTo" class="event-input" />
+                            </div>
                         </div>
                     </div>
-                    
-                    <div class="duration-selection" style="margin-top: 1.5rem;">
-                        <label style="display: block; font-size: 0.9rem; font-weight: 500; color: var(--text-muted); margin-bottom: 0.8rem;">Duration Slot</label>
-                        <div class="duration-grid">
-                            <button class="duration-btn" data-duration="3 hours">3 Hours</button>
-                            <button class="duration-btn" data-duration="6 hours">6 Hours</button>
-                            <button class="duration-btn" data-duration="Full Day">Full Day</button>
-                        </div>
-                    </div>
+                    <div id="durationError" style="display: none; color: #ff5252; margin-top: 1rem; font-size: 0.9rem; text-align: center;"></div>
                 </div>
 
                 <!-- Next Button -->
@@ -212,17 +210,18 @@ if (!isset($_SESSION["username"])) {
 
         // ===== Occasions Selection Logic =====
         const cards = document.querySelectorAll('.occasion-card');
-        const durationBtns = document.querySelectorAll('.duration-btn');
-        const dateInput = document.getElementById('eventDate');
-        const timeInput = document.getElementById('eventTime');
+        const eventDate = document.getElementById('eventDate');
+        const timeFrom = document.getElementById('timeFrom');
+        const timeTo = document.getElementById('timeTo');
+        const durationError = document.getElementById('durationError');
         const nextBtn = document.getElementById('nextBtn');
         
         let selectedOccasion = null;
-        let selectedDuration = null;
+        let diffHours = 0;
 
         // Set minimum date to today
         const today = new Date().toISOString().split('T')[0];
-        dateInput.setAttribute('min', today);
+        eventDate.setAttribute('min', today);
 
         // Card selection (single-select)
         cards.forEach(card => {
@@ -238,23 +237,42 @@ if (!isset($_SESSION["username"])) {
             });
         });
 
-        // Duration Button selection
-        durationBtns.forEach(btn => {
-            btn.addEventListener('click', () => {
-                durationBtns.forEach(b => b.classList.remove('active'));
-                btn.classList.add('active');
-                selectedDuration = btn.getAttribute('data-duration');
-                validateForm();
-            });
-        });
-
-        // Validate and toggle Next button
-        dateInput.addEventListener('change', validateForm);
-        timeInput.addEventListener('change', validateForm);
+        eventDate.addEventListener('change', validateForm);
+        timeFrom.addEventListener('change', validateForm);
+        timeTo.addEventListener('change', validateForm);
 
         function validateForm() {
-            const isValid = selectedOccasion && selectedDuration && dateInput.value && timeInput.value;
-            nextBtn.disabled = !isValid;
+            let isValid = false;
+            let errorMsg = '';
+            
+            if (eventDate.value && timeFrom.value && timeTo.value) {
+                const fromDateTime = new Date(`${eventDate.value}T${timeFrom.value}`);
+                let toDateTime = new Date(`${eventDate.value}T${timeTo.value}`);
+                
+                // If 'To' time is earlier than 'From' time, assume the party ends past midnight the next day.
+                if (toDateTime <= fromDateTime) {
+                    toDateTime.setDate(toDateTime.getDate() + 1);
+                }
+                
+                diffHours = (toDateTime - fromDateTime) / (1000 * 60 * 60);
+                
+                if (diffHours >= 2 && diffHours <= 12) {
+                    isValid = true;
+                } else if (diffHours < 2) {
+                    errorMsg = 'Minimum event duration is 2 hours.';
+                } else if (diffHours > 12) {
+                    errorMsg = 'Maximum event duration is 12 hours.';
+                }
+            }
+
+            if (errorMsg) {
+                durationError.innerText = errorMsg;
+                durationError.style.display = 'block';
+            } else {
+                durationError.style.display = 'none';
+            }
+
+            nextBtn.disabled = !(selectedOccasion && isValid);
         }
 
         // Next button — save and proceed
@@ -262,12 +280,17 @@ if (!isset($_SESSION["username"])) {
             if (nextBtn.disabled) return;
             const eventData = {
                 occasion: selectedOccasion,
-                date: dateInput.value,
-                startTime: timeInput.value,
-                duration: selectedDuration
+                date: eventDate.value,
+                startTime: timeFrom.value,
+                duration: diffHours.toFixed(1) + ' hours',
+                hours: parseFloat(diffHours.toFixed(1))
             };
             localStorage.setItem('festivoEvent', JSON.stringify(eventData));
+<<<<<<< HEAD
             window.location.href = "products.html";
+=======
+            window.location.href = 'products.html';
+>>>>>>> 23701f649442fc26c7c3f0b3c59db0cce69f354a
         });
     </script>
 </body>
