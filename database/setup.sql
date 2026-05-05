@@ -1,4 +1,4 @@
-CREATE DATABASE festivo_db;
+CREATE DATABASE IF NOT EXISTS festivo_db;
 USE festivo_db;
 CREATE TABLE customer (
     customer_id INT AUTO_INCREMENT PRIMARY KEY,
