@@ -17,14 +17,14 @@ if ($result->num_rows > 0) {
 
         $_SESSION["username"] = $row["username"]; 
 
-        header("Location: /FESTIVO/customer_home/index.php");
+        header("Location: ../customer_home/index.php");
         exit();
     } else {
-        header("Location: /FESTIVO/Login Page/login.html?error=1");
+        header("Location: ../Login Page/login.html?error=1");
         exit();
     }
 } else {
-    header("Location: /FESTIVO/Login Page/login.html?error=1");
+    header("Location: ../Login Page/login.html?error=1");
     exit();
 }
 }

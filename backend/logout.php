@@ -3,6 +3,6 @@ session_start();
 session_unset();
 session_destroy();
 
-header("Location: /FESTIVO/Login Page/login.html");
+header("Location: ../Login Page/login.html");
 exit();
 ?>

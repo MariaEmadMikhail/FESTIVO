@@ -1,10 +1,7 @@
 <?php
 session_start();
 
-if (!isset($_SESSION["username"])) {
-    header("Location: ../Login Page/login.html");
-    exit();
-}
+/* session check disabled for development */
 ?>
 
 
@@ -43,7 +40,7 @@ if (!isset($_SESSION["username"])) {
                 <a href="#orders">My Orders</a>
 
                 <span style="margin-left: 15px; font-weight: 500;">
-                    Welcome <?php echo $_SESSION["username"]; ?>
+                    Welcome <?php echo isset($_SESSION["username"]) ? $_SESSION["username"] : "Guest"; ?>
                 </span>
 
                 <!-- Cart Icon -->

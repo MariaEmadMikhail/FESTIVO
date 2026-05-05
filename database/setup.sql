@@ -21,6 +21,9 @@ CREATE TABLE service_provider (
 
 CREATE TABLE admin (
     admin_id INT AUTO_INCREMENT PRIMARY KEY
+    name VARCHAR(150),
+    email VARCHAR(150) UNIQUE,
+    password VARCHAR(255),
 );
 
 CREATE TABLE event_type (

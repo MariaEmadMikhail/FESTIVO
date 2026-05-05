@@ -1,10 +1,7 @@
 <?php
 session_start();
 
-if (!isset($_SESSION["username"])) {
-    header("Location: ../Login Page/login.html");
-    exit();
-}
+/* session check disabled for development */
 ?>
 
 
@@ -78,6 +75,10 @@ if (!isset($_SESSION["username"])) {
         <!-- Occasions Selection Section -->
         <section class="occasions-section" style="margin-top: 4rem;">
             <div class="section-container">
+                <a href="index.php" class="back-btn">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+                    Back to Home
+                </a>
                 <h1 class="section-title">Plan Your Next Big Moment</h1>
                 <p class="occasions-subtitle">Select your occasion type and the perfect date & time to get started.</p>
 
@@ -286,11 +287,7 @@ if (!isset($_SESSION["username"])) {
                 hours: parseFloat(diffHours.toFixed(1))
             };
             localStorage.setItem('festivoEvent', JSON.stringify(eventData));
-<<<<<<< HEAD
-            window.location.href = "products.html";
-=======
-            window.location.href = 'products.html';
->>>>>>> 23701f649442fc26c7c3f0b3c59db0cce69f354a
+            window.location.href = 'products.php';
         });
     </script>
 </body>

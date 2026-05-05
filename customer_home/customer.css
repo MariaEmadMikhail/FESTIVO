@@ -43,7 +43,40 @@
     box-shadow: 0 2px 4px rgba(0,0,0,0.3);
 }
 
-/* Logout styling */
+/* Back Button styling */
+.back-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.8rem;
+    padding: 0.6rem 1.2rem;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    color: var(--text-muted) !important;
+    font-size: 0.9rem;
+    font-weight: 500;
+    text-decoration: none;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    margin-bottom: 1.5rem;
+    backdrop-filter: blur(5px);
+}
+
+.back-btn svg {
+    transition: transform 0.3s ease;
+}
+
+.back-btn:hover {
+    background: rgba(210, 145, 188, 0.1);
+    border-color: var(--secondary);
+    color: var(--text) !important;
+    transform: translateX(-5px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+}
+
+.back-btn:hover svg {
+    transform: translateX(-3px);
+}
+
 .logout-btn {
     display: flex;
     align-items: center;
@@ -824,6 +857,41 @@ select.form-input {
 .summary-item .value {
     font-weight: 500;
     color: var(--text);
+}
+
+/* Flavor Selection styling */
+.flavor-selection {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.6rem;
+    margin-top: 0.5rem;
+}
+
+.flavor-chip {
+    padding: 0.5rem 1.2rem;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid var(--border);
+    border-radius: 50px;
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: var(--text-muted);
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    backdrop-filter: blur(5px);
+}
+
+.flavor-chip:hover {
+    background: rgba(255, 255, 255, 0.08);
+    border-color: var(--text-muted);
+    color: var(--text);
+}
+
+.flavor-chip.active {
+    background: linear-gradient(135deg, var(--primary), var(--secondary));
+    color: white;
+    border-color: transparent;
+    box-shadow: 0 4px 12px rgba(210, 145, 188, 0.4);
+    transform: translateY(-2px);
 }
 
 

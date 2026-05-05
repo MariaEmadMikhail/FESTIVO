@@ -57,7 +57,7 @@ if (params.get("error") === "1") {
         
     }
 
-    form.addEventListener('submit', (e) => {
+    form.addEventListener('submit', async (e) => {
         e.preventDefault();
         const username = usernameInput.value.trim();
         const password = passwordInput.value;
@@ -68,145 +68,83 @@ if (params.get("error") === "1") {
             return;
         }
 
-        if (password === 'wrong' || password.length < 4 || username === 'wrong') {
-            loginError.classList.add('show');
-            usernameInput.classList.add('invalid');
-            passwordInput.classList.add('invalid');
-            form.classList.add('shake');
-            setTimeout(() => form.classList.remove('shake'), 400);
-            return;
-        }
+        const submitBtn = form.querySelector('.user-btn');
+        const originalText = submitBtn.innerHTML;
+        submitBtn.innerHTML = 'Checking...';
+        submitBtn.disabled = true;
 
-        startVerificationStep(false);
-    });
-
-    adminLoginBtn.addEventListener('click', (e) => {
-        e.preventDefault();
-        // HTML5 Validation trigger before Admin flow
-        if (!form.checkValidity()) {
-            form.reportValidity();
-            return;
-        }
-        handleLogin(true); // Admin login
-    });
-
-    forgotPasswordLink.addEventListener('click', (e) => {
-        e.preventDefault();
-        const username = usernameInput.value.trim();
-        
-        if (username) {
-            alert(`Password reset instructions have been sent to the email associated with '${username}'.`);
-        } else {
-            alert('Please enter your username first to retrieve your password.');
-            usernameInput.focus();
-            usernameInput.classList.add('invalid');
-            setTimeout(() => usernameInput.classList.remove('invalid'), 2000);
-        }
-    });
-
-    // Clear invalid styling when user types
-    usernameInput.addEventListener('input', () => {
-        usernameInput.classList.remove('invalid');
-        loginError.classList.remove('show');
-    });
-
-    passwordInput.addEventListener('input', () => {
-        passwordInput.classList.remove('invalid');
-        loginError.classList.remove('show');
-    });
-
-    const otpCodeInput = document.getElementById('otpCode');
-    if(otpCodeInput) {
-        otpCodeInput.addEventListener('input', () => {
-            otpCodeInput.classList.remove('invalid');
-            loginError.classList.remove('show');
-        });
-    }
-
-    // 2FA VERIFICATION LOGIC
-    const socialBox = document.getElementById('socialBox');
-    const otpVerificationStep = document.getElementById('otpVerificationStep');
-    const otpSelectionGroup = document.getElementById('otpSelectionGroup');
-    const otpInputGroup = document.getElementById('otpInputGroup');
-    const requestOtpBtn = document.getElementById('requestOtpBtn');
-    const verifyOtpBtn = document.getElementById('verifyOtpBtn');
-    const resendCodeLink = document.getElementById('resendCodeLink');
-    const otpMethodRadios = document.querySelectorAll('input[name="otpMethod"]');
-    const verificationCodeInput = document.getElementById('verificationCode');
-    const verificationError = document.getElementById('verificationError');
-
-    let isAdminLogin = false;
-
-    function startVerificationStep(admin) {
-        isAdminLogin = admin;
-        form.style.display = 'none';
-        if(socialBox) socialBox.style.display = 'none';
-        if(otpVerificationStep) otpVerificationStep.style.display = 'block';
-    }
-
-    const googleLoginBtn = document.getElementById('googleLoginBtn');
-    if (googleLoginBtn) {
-        googleLoginBtn.addEventListener('click', () => {
-            const btnOriginal = googleLoginBtn.innerHTML;
-            googleLoginBtn.innerHTML = 'Authenticating...';
-            setTimeout(() => {
-                googleLoginBtn.innerHTML = btnOriginal;
-                startVerificationStep(false);
-            }, 800);
-        });
-    }
-
-    if (otpMethodRadios.length > 0) {
-        otpMethodRadios.forEach(radio => {
-            radio.addEventListener('change', (e) => {
-                otpMethodRadios.forEach(r => {
-                    r.parentElement.style.borderColor = 'var(--border)';
-                    r.parentElement.style.background = 'transparent';
-                });
-                if(e.target.checked) {
-                    e.target.parentElement.style.borderColor = 'var(--secondary)';
-                    e.target.parentElement.style.background = 'rgba(0, 206, 201, 0.1)';
-                }
+        try {
+            const response = await fetch('../backend/login_init.php', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ username, password })
             });
-        });
-    }
+            const result = await response.json();
 
-    if (requestOtpBtn) {
-        requestOtpBtn.addEventListener('click', () => {
-            const methodEl = document.querySelector('input[name="otpMethod"]:checked');
-            const method = methodEl ? methodEl.value : 'email';
-            requestOtpBtn.innerHTML = 'Sending...';
-            
-            setTimeout(() => {
-                otpSelectionGroup.style.display = 'none';
-                otpInputGroup.style.display = 'block';
-                alert(`Verification code sent via ${method.toUpperCase()}! (Use 123456)`);
-            }, 600);
-        });
-    }
+            if (result.status === 'otp_sent') {
+                // Show email in UI for better UX
+                const otpDesc = otpVerificationStep.querySelector('p');
+                if (otpDesc) otpDesc.innerText = `We sent a code to ${result.email}`;
+                
+                // For testing purposes, alert the code (since mail() might not be configured)
+                if (result.debug_otp) {
+                   console.log("Debug OTP:", result.debug_otp);
+                   alert(`Verification code sent! (Debug: ${result.debug_otp})`);
+                }
+
+                startVerificationStep(false);
+            } else {
+                loginError.innerText = result.message || 'Invalid username or password.';
+                loginError.classList.add('show');
+                form.classList.add('shake');
+                setTimeout(() => form.classList.remove('shake'), 400);
+            }
+        } catch (error) {
+            console.error("Login Init Error:", error);
+            alert("Connection error. Please try again.");
+        } finally {
+            submitBtn.innerHTML = originalText;
+            submitBtn.disabled = false;
+        }
+    });
 
     if (verifyOtpBtn) {
-        verifyOtpBtn.addEventListener('click', () => {
-            const code = verificationCodeInput.value.trim();
-            if (code !== '123456') {
-                verificationError.style.display = 'block';
+        verifyOtpBtn.addEventListener('click', async () => {
+            const otp = verificationCodeInput.value.trim();
+            if (!otp) {
                 verificationCodeInput.classList.add('invalid');
                 return;
             }
             
-            verificationError.style.display = 'none';
-            verifyOtpBtn.innerHTML = 'Verifying... ✓';
-            verifyOtpBtn.style.background = 'var(--success)';
-            
-            setTimeout(() => {
-                if (isAdminLogin) {
-                    alert('Verified! Logged in successfully as Admin.');
-                    window.location.href = '../admin_home/index.html';
+            verifyOtpBtn.innerHTML = 'Verifying...';
+            verifyOtpBtn.disabled = true;
+
+            try {
+                const response = await fetch('../backend/login_verify.php', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ otp })
+                });
+                const result = await response.json();
+
+                if (result.status === 'success') {
+                    verifyOtpBtn.innerHTML = 'Success! ✓';
+                    verifyOtpBtn.style.background = 'var(--success)';
+                    setTimeout(() => {
+                        window.location.href = '../customer_home/index.php';
+                    }, 1000);
                 } else {
-                    alert('Verified! Logged in successfully.');
-                    window.location.href = '../customer_home/index.html';
+                    verificationError.innerText = result.message || 'Invalid code.';
+                    verificationError.style.display = 'block';
+                    verificationCodeInput.classList.add('invalid');
+                    verifyOtpBtn.innerHTML = 'Verify & Proceed';
+                    verifyOtpBtn.disabled = false;
                 }
-            }, 1000);
+            } catch (error) {
+                console.error("OTP Verify Error:", error);
+                alert("Connection error. Please try again.");
+                verifyOtpBtn.disabled = false;
+            }
         });
     }
 

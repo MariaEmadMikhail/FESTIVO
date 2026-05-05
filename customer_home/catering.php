@@ -1,10 +1,7 @@
 <?php
 session_start();
 
-if (!isset($_SESSION["username"])) {
-    header("Location: ../Login Page/login.html");
-    exit();
-}
+/* session check disabled for development */
 ?>
 
 <!DOCTYPE html>
@@ -38,10 +35,10 @@ if (!isset($_SESSION["username"])) {
             <div class="nav-links" id="navLinks">
                 <a href="index.php">HOME</a>
                 <a href="occasions.php">Occasions</a>
-                <a href="products.html">Products</a>
+                <a href="products.php">Products</a>
                 <a href="catering.php" class="active">Catering</a>
 
-                <a href="checkout.html" class="cart-icon" title="My Cart">
+                <a href="checkout.php" class="cart-icon" title="My Cart">
                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
                         stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                         <circle cx="9" cy="21" r="1"></circle>
@@ -64,7 +61,7 @@ if (!isset($_SESSION["username"])) {
 
     <main style="margin-top: 80px; padding-bottom: 120px;">
         <div class="section-container">
-            <a href="products.html" class="back-btn" style="margin-left: 2rem;">
+            <a href="products.php" class="back-btn" style="margin-left: 2rem;">
                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
                 Back to Products
             </a>
@@ -144,10 +141,9 @@ if (!isset($_SESSION["username"])) {
         function renderCatering() {
             const grid = document.getElementById('cateringGrid');
             grid.innerHTML = cateringItems.map(item => {
-                const activeFlavorChip = document.querySelector(`#flavors-${item.id} .flavor-chip.active`);
-                const currentFlavor = activeFlavorChip ? activeFlavorChip.innerText.trim() : "Chocolate";
-                
-                const cartItem = cart.find(c => c.id === item.id && c.flavor === currentFlavor);
+                // Find if this item is in cart to get the quantity/flavor
+                const cartItem = cart.find(c => c.id === item.id);
+                const currentFlavor = cartItem ? cartItem.flavor : "Chocolate";
                 const quantity = cartItem ? cartItem.quantity : 1;
                 const isAdded = !!cartItem;
 
@@ -210,12 +206,15 @@ if (!isset($_SESSION["username"])) {
             parent.querySelectorAll('.flavor-chip').forEach(c => c.classList.remove('active'));
             el.classList.add('active');
             
-            // UI Update for add button and quantity based on new flavor selection
-            const cartItem = cart.find(c => c.id === id && c.flavor === flavor);
+            // If item is already in cart, update its flavor
+            const cartItem = cart.find(c => c.id === id);
             const btn = document.getElementById(`btn-${id}`);
             const qtySpan = document.getElementById(`qty-${id}`);
 
             if (cartItem) {
+                cartItem.flavor = flavor;
+                saveCart();
+                updateCartUI();
                 btn.classList.add('added');
                 btn.innerText = 'Added';
                 qtySpan.innerText = cartItem.quantity;
@@ -261,7 +260,7 @@ if (!isset($_SESSION["username"])) {
         }
 
         document.getElementById('finishBtn').addEventListener('click', () => {
-             window.location.href = 'checkout.html';
+             window.location.href = 'checkout.php';
         });
 
         init();
