@@ -1,5 +1,6 @@
 CREATE DATABASE IF NOT EXISTS festivo_db;
 USE festivo_db;
+
 CREATE TABLE customer (
     customer_id INT AUTO_INCREMENT PRIMARY KEY,
     first_name VARCHAR(100),
@@ -10,28 +11,37 @@ CREATE TABLE customer (
     phone VARCHAR(20),
     age INT
 );
+
 CREATE TABLE service_provider (
     provider_id INT AUTO_INCREMENT PRIMARY KEY,
     name VARCHAR(150),
     email VARCHAR(150),
     phone VARCHAR(20)
 );
+
 CREATE TABLE admin (
     admin_id INT AUTO_INCREMENT PRIMARY KEY
 );
+
 CREATE TABLE event_type (
     event_type_id INT AUTO_INCREMENT PRIMARY KEY,
     name VARCHAR(100)
 );
+
+-- UPDATED ONLY HERE (added provider_id FK)
 CREATE TABLE service (
     service_id INT AUTO_INCREMENT PRIMARY KEY,
+    provider_id INT,
     name VARCHAR(150),
     type VARCHAR(100),
     quantity INT,
-    photo VARCHAR(255)
-     status ENUM('pending', 'approved', 'rejected') DEFAULT 'pending',
+    photo VARCHAR(255),
+    status ENUM('pending', 'approved', 'rejected') DEFAULT 'pending',
+
+    FOREIGN KEY (provider_id) REFERENCES service_provider(provider_id)
 );
-CREATE TABLE order (
+
+CREATE TABLE orders (
     order_id INT AUTO_INCREMENT PRIMARY KEY,
     customer_id INT,
     event_type_id INT,
@@ -41,37 +51,28 @@ CREATE TABLE order (
     end_time DATETIME,
     status ENUM('pending', 'confirmed', 'completed', 'cancelled') DEFAULT 'pending',
     total_price DECIMAL(10,2),
-   location VARCHAR(255),
+    location VARCHAR(255),
 
     FOREIGN KEY (customer_id) REFERENCES customer(customer_id),
     FOREIGN KEY (event_type_id) REFERENCES event_type(event_type_id)
-);
-CREATE TABLE booking_service (
-    booking_id INT,
-    service_id INT,
-
-    PRIMARY KEY (booking_id, service_id),
-
-    FOREIGN KEY (booking_id) REFERENCES booking(booking_id),
-    FOREIGN KEY (service_id) REFERENCES service(service_id)
 );
 
 CREATE TABLE categories (
     category_id INT AUTO_INCREMENT PRIMARY KEY,
     name VARCHAR(100) NOT NULL
 );
+
 CREATE TABLE payments (
     payment_id INT AUTO_INCREMENT PRIMARY KEY,
     order_id INT,
-
     amount DECIMAL(10,2) NOT NULL,
     payment_method ENUM('cash', 'card', 'wallet') NOT NULL,
     payment_status ENUM('pending', 'paid', 'failed') DEFAULT 'pending',
-
     paid_at DATETIME,
 
     FOREIGN KEY (order_id) REFERENCES orders(order_id)
 );
+
 CREATE TABLE products (
     product_id INT AUTO_INCREMENT PRIMARY KEY,
     provider_id INT,
@@ -82,9 +83,10 @@ CREATE TABLE products (
     description TEXT,
     is_rentable BOOLEAN DEFAULT TRUE,
 
-    FOREIGN KEY (provider_id) REFERENCES providers(provider_id),
+    FOREIGN KEY (provider_id) REFERENCES service_provider(provider_id),
     FOREIGN KEY (category_id) REFERENCES categories(category_id)
 );
+
 CREATE TABLE product_colors (
     color_id INT AUTO_INCREMENT PRIMARY KEY,
     product_id INT,
@@ -92,6 +94,7 @@ CREATE TABLE product_colors (
 
     FOREIGN KEY (product_id) REFERENCES products(product_id)
 );
+
 CREATE TABLE order_items (
     order_item_id INT AUTO_INCREMENT PRIMARY KEY,
     order_id INT,
@@ -102,12 +105,14 @@ CREATE TABLE order_items (
     FOREIGN KEY (order_id) REFERENCES orders(order_id),
     FOREIGN KEY (product_id) REFERENCES products(product_id)
 );
+
 CREATE TABLE rental_pricing (
     pricing_id INT AUTO_INCREMENT PRIMARY KEY,
     min_hours INT NOT NULL,
     max_hours INT NOT NULL,
     multiplier DECIMAL(4,2) NOT NULL
 );
+
 INSERT INTO rental_pricing (min_hours, max_hours, multiplier) VALUES
 (1, 3, 1.00),
 (4, 6, 0.80),
