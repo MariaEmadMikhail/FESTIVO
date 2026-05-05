@@ -46,13 +46,9 @@ if (params.get("error") === "1") {
         
     }
 
-<<<<<<< Updated upstream
     form.addEventListener('submit', async (e) => {
         e.preventDefault();
-=======
-    form.addEventListener('submit', (e) => {
-        
->>>>>>> Stashed changes
+
         const username = usernameInput.value.trim();
         const password = passwordInput.value;
 
@@ -64,7 +60,6 @@ if (params.get("error") === "1") {
             return;
         }
 
-<<<<<<< Updated upstream
         const submitBtn = form.querySelector('.user-btn');
         const originalText = submitBtn.innerHTML;
         submitBtn.innerHTML = 'Checking...';
@@ -75,109 +70,13 @@ if (params.get("error") === "1") {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ username, password })
-=======
-        
-
-        
-    });
-
-    adminLoginBtn.addEventListener('click', (e) => {
-        e.preventDefault();
-        // HTML5 Validation trigger before Admin flow
-        if (!form.checkValidity()) {
-            form.reportValidity();
-            return;
-        }
-        handleLogin(true); // Admin login
-    });
-
-    forgotPasswordLink.addEventListener('click', (e) => {
-        e.preventDefault();
-        const username = usernameInput.value.trim();
-        
-        if (username) {
-            alert(`Password reset instructions have been sent to the email associated with '${username}'.`);
-        } else {
-            alert('Please enter your username first to retrieve your password.');
-            usernameInput.focus();
-            usernameInput.classList.add('invalid');
-            setTimeout(() => usernameInput.classList.remove('invalid'), 2000);
-        }
-    });
-
-    // Clear invalid styling when user types
-    usernameInput.addEventListener('input', () => {
-        usernameInput.classList.remove('invalid');
-        loginError.classList.remove('show');
-    });
-
-    passwordInput.addEventListener('input', () => {
-        passwordInput.classList.remove('invalid');
-        loginError.classList.remove('show');
-    });
-
-    const otpCodeInput = document.getElementById('otpCode');
-    if(otpCodeInput) {
-        otpCodeInput.addEventListener('input', () => {
-            otpCodeInput.classList.remove('invalid');
-            loginError.classList.remove('show');
-        });
-    }
-
-    // 2FA VERIFICATION LOGIC
-    const socialBox = document.getElementById('socialBox');
-    const otpVerificationStep = document.getElementById('otpVerificationStep');
-    const otpSelectionGroup = document.getElementById('otpSelectionGroup');
-    const otpInputGroup = document.getElementById('otpInputGroup');
-    const requestOtpBtn = document.getElementById('requestOtpBtn');
-    const verifyOtpBtn = document.getElementById('verifyOtpBtn');
-    const resendCodeLink = document.getElementById('resendCodeLink');
-    const otpMethodRadios = document.querySelectorAll('input[name="otpMethod"]');
-    const verificationCodeInput = document.getElementById('verificationCode');
-    const verificationError = document.getElementById('verificationError');
-
-    let isAdminLogin = false;
-
-    function startVerificationStep(admin) {
-        isAdminLogin = admin;
-        form.style.display = 'none';
-        if(socialBox) socialBox.style.display = 'none';
-        if(otpVerificationStep) otpVerificationStep.style.display = 'block';
-    }
-
-    const googleLoginBtn = document.getElementById('googleLoginBtn');
-    if (googleLoginBtn) {
-        googleLoginBtn.addEventListener('click', () => {
-            const btnOriginal = googleLoginBtn.innerHTML;
-            googleLoginBtn.innerHTML = 'Authenticating...';
-            setTimeout(() => {
-                googleLoginBtn.innerHTML = btnOriginal;
-                startVerificationStep(false);
-            }, 800);
-        });
-    }
-
-    if (otpMethodRadios.length > 0) {
-        otpMethodRadios.forEach(radio => {
-            radio.addEventListener('change', (e) => {
-                otpMethodRadios.forEach(r => {
-                    r.parentElement.style.borderColor = 'var(--border)';
-                    r.parentElement.style.background = 'transparent';
-                });
-                if(e.target.checked) {
-                    e.target.parentElement.style.borderColor = 'var(--secondary)';
-                    e.target.parentElement.style.background = 'rgba(0, 206, 201, 0.1)';
-                }
->>>>>>> Stashed changes
             });
             const result = await response.json();
 
             if (result.status === 'otp_sent') {
-                // Show email in UI for better UX
-                const otpDesc = otpVerificationStep.querySelector('p');
+                const otpDesc = document.getElementById('otpVerificationStep').querySelector('p');
                 if (otpDesc) otpDesc.innerText = `We sent a code to ${result.email}`;
                 
-                // For testing purposes, alert the code (since mail() might not be configured)
                 if (result.debug_otp) {
                    console.log("Debug OTP:", result.debug_otp);
                    alert(`Verification code sent! (Debug: ${result.debug_otp})`);
@@ -198,6 +97,51 @@ if (params.get("error") === "1") {
             submitBtn.disabled = false;
         }
     });
+
+    adminLoginBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        if (!form.checkValidity()) {
+            form.reportValidity();
+            return;
+        }
+        handleLogin(true);
+    });
+
+    forgotPasswordLink.addEventListener('click', (e) => {
+        e.preventDefault();
+        const username = usernameInput.value.trim();
+        if (username) {
+            alert(`Password reset instructions have been sent to the email associated with '${username}'.`);
+        } else {
+            alert('Please enter your username first to retrieve your password.');
+            usernameInput.focus();
+            usernameInput.classList.add('invalid');
+            setTimeout(() => usernameInput.classList.remove('invalid'), 2000);
+        }
+    });
+
+    usernameInput.addEventListener('input', () => {
+        usernameInput.classList.remove('invalid');
+        loginError.classList.remove('show');
+    });
+
+    passwordInput.addEventListener('input', () => {
+        passwordInput.classList.remove('invalid');
+        loginError.classList.remove('show');
+    });
+
+    const socialBox = document.getElementById('socialBox');
+    const otpVerificationStep = document.getElementById('otpVerificationStep');
+    const verifyOtpBtn = document.getElementById('verifyOtpBtn');
+    const resendCodeLink = document.getElementById('resendCodeLink');
+    const verificationCodeInput = document.getElementById('verificationCode');
+    const verificationError = document.getElementById('verificationError');
+
+    function startVerificationStep(admin) {
+        form.style.display = 'none';
+        if(socialBox) socialBox.style.display = 'none';
+        if(otpVerificationStep) otpVerificationStep.style.display = 'block';
+    }
 
     if (verifyOtpBtn) {
         verifyOtpBtn.addEventListener('click', async () => {
@@ -225,16 +169,11 @@ if (params.get("error") === "1") {
                         window.location.href = '../customer_home/index.php';
                     }, 1000);
                 } else {
-<<<<<<< Updated upstream
                     verificationError.innerText = result.message || 'Invalid code.';
                     verificationError.style.display = 'block';
                     verificationCodeInput.classList.add('invalid');
                     verifyOtpBtn.innerHTML = 'Verify & Proceed';
                     verifyOtpBtn.disabled = false;
-=======
-                    alert('Verified! Logged in successfully.');
-                    
->>>>>>> Stashed changes
                 }
             } catch (error) {
                 console.error("OTP Verify Error:", error);
