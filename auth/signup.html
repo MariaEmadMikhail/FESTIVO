@@ -24,7 +24,7 @@
                 <p>Join the ultimate event planning experience</p>
             </div>
             
-            <form id="signup-form" action="/FESTIVO/backend/signup.php" method="POST">
+            <form id="signup-form">
                 <div class="form-row">
                     <div class="input-group">
                         <label for="firstName">First Name</label>
@@ -115,12 +115,11 @@
                     <p style="margin-bottom: 1rem; font-size: 0.95rem; text-align: center; color: var(--text-muted);">Send code via:</p>
                     <div style="display: flex; gap: 1rem;">
                         <label class="social-btn otp-method-label" style="flex: 1; margin: 0; border-color: var(--secondary); background: rgba(0, 206, 201, 0.1);">
-                            <input type="radio" name="signupOtpMethod" value="email" checked style="display: none;">
+                            <input type="radio" name="signupOtpMethod" value="email" checked style="opacity: 0; position: absolute;">
                             Email
                         </label>
                         <label class="social-btn otp-method-label" style="flex: 1; margin: 0;">
-                            <input type="radio" name="signupOtpMethod" value="sms" style="display: none;">
-                            SMS
+                            
                         </label>
                     </div>
                     <button type="button" class="submit-btn" id="reqSignupOtpBtn" style="margin-top: 1.5rem; background: transparent; border: 1px solid var(--secondary); color: var(--secondary);">Send Verification Code</button>
@@ -205,8 +204,7 @@
                             Email
                         </label>
                         <label class="social-btn otp-method-label" style="flex: 1; margin: 0;">
-                            <input type="radio" name="loginOtpMethod" value="sms" style="display: none;">
-                            SMS
+                            
                         </label>
                     </div>
                     <button type="button" class="submit-btn" id="reqLoginOtpBtn" style="margin-top: 1.5rem; background: transparent; border: 1px solid var(--secondary); color: var(--secondary);">Send Verification Code</button>

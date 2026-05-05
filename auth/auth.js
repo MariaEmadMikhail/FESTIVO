@@ -93,27 +93,7 @@ document.addEventListener('DOMContentLoaded', () => {
         validateField(confirmPassword, confirmPasswordError, null, () => password.value === confirmPassword.value);
     });
 
-    signupForm.addEventListener('submit', (e) => {
-
-    const isFirstNameValid = validateField(firstName, firstNameError, nameRegex);
-    const isLastNameValid = validateField(lastName, lastNameError, nameRegex);
-    const isPasswordValid = password.value.length > 0 && password.value.length <= 12;
-    const isConfirmPasswordValid = confirmPassword.value.length > 0 && password.value === confirmPassword.value;
-
-    if (!(isFirstNameValid && isLastNameValid && isEmailValid && isPasswordValid && isConfirmPasswordValid)) {
-        e.preventDefault();
-
-        validateField(firstName, firstNameError, nameRegex);
-        validateField(lastName, lastNameError, nameRegex);
-        validateField(email, emailError, emailRegex);
-        validateField(password, passwordError, null, () => password.value.length > 0 && password.value.length <= 12);
-        validateField(confirmPassword, confirmPasswordError, null, () => password.value === confirmPassword.value);
-
-        signupForm.classList.add('shake');
-        setTimeout(() => signupForm.classList.remove('shake'), 400);
-        return;
-    }
-
+  signupForm.addEventListener('submit', (e) => {
     e.preventDefault();
     startSignupVerificationStep();
 });
@@ -278,6 +258,43 @@ document.addEventListener('DOMContentLoaded', () => {
     const resendSignupCodeLink = document.getElementById('resendSignupCodeLink');
     const signupOtpMethodRadios = document.querySelectorAll('input[name="signupOtpMethod"]');
 
+    if (reqSignupOtpBtn) {
+    reqSignupOtpBtn.addEventListener('click', async () => {
+
+        const emailValue = email.value;
+
+        if (!emailValue) {
+            alert("Enter your email first");
+            return;
+        }
+
+        reqSignupOtpBtn.innerHTML = 'Sending...';
+
+        try {
+            const response = await fetch('/FESTIVO/backend/send_otp.php', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    email: emailValue
+                })
+            });
+
+            const data = await response.json();
+
+            if (data.status === 'otp_sent') {
+                signupOtpSelGrp.style.display = 'none';
+                signupOtpInpGrp.style.display = 'block';
+            } else {
+                alert("Failed to send OTP");
+            }
+
+        } catch (error) {
+            console.error(error);
+            alert("Server error");
+        }
+    });
+}
+
     function startSignupVerificationStep() {
         signupForm.style.display = 'none';
         if(signupSocialBox) signupSocialBox.style.display = 'none';
@@ -310,35 +327,37 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    if (reqSignupOtpBtn) {
-        reqSignupOtpBtn.addEventListener('click', () => {
-            const checked = document.querySelector('input[name="signupOtpMethod"]:checked');
-            const method = checked ? checked.value : 'email';
-            reqSignupOtpBtn.innerHTML = 'Sending...';
-            setTimeout(() => {
-                signupOtpSelGrp.style.display = 'none';
-                signupOtpInpGrp.style.display = 'block';
-                alert(`Verification code sent via ${method.toUpperCase()}! (Use 123456)`);
-            }, 600);
-        });
-    }
+    
 
     if (verifySignupOtpBtn) {
-        verifySignupOtpBtn.addEventListener('click', () => {
-            if (signupVerifyCode.value.trim() !== '123456') {
-                signupVerifyCode.classList.add('invalid');
-                signupVerifyError.style.display = 'block';
-                return;
-            }
-            signupVerifyError.style.display = 'none';
-            verifySignupOtpBtn.innerHTML = 'Verifying... ✓';
-            verifySignupOtpBtn.style.background = 'var(--success)';
-            setTimeout(() => {
-                alert('Verified! Account created successfully.');
-                window.location.href = '../customer_home/index.html';
-            }, 1000);
+    verifySignupOtpBtn.addEventListener('click', async () => {
+
+        const otp = signupVerifyCode.value;
+
+        if (!otp) {
+            signupVerifyCode.classList.add('invalid');
+            signupVerifyError.style.display = 'block';
+            return;
+        }
+
+        const response = await fetch('/FESTIVO/backend/signup.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                action: "verify_otp",
+                otp: otp
+            })
         });
-    }
+
+        const result = await response.json();
+
+        if (result.status === "success") {
+            window.location.href = "login.html";
+        } else {
+            signupVerifyError.style.display = 'block';
+        }
+    });
+}   
 
     if (resendSignupCodeLink) resendSignupCodeLink.addEventListener('click', (e) => { e.preventDefault(); alert("New code sent!"); });
     if (signupVerifyCode) signupVerifyCode.addEventListener('input', () => { signupVerifyCode.classList.remove('invalid'); signupVerifyError.style.display = 'none'; });
