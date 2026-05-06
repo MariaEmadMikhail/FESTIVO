@@ -33,10 +33,11 @@ session_start();
             </a>
 
             <div class="nav-links" id="navLinks">
-                <a href="index.php">HOME</a>
+                <a href="index.php">Home</a>
                 <a href="occasions.php">Occasions</a>
                 <a href="products.php">Products</a>
                 <a href="catering.php" class="active">Catering</a>
+                <a href="my-orders.php">My Orders</a>
 
                 <a href="checkout.php" class="cart-icon" title="My Cart">
                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
@@ -49,6 +50,13 @@ session_start();
                 </a>
 
                 <a href="../backend/logout.php" class="logout-btn">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                        style="margin-right: 5px; vertical-align: text-bottom;">
+                        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                        <polyline points="16 17 21 12 16 7"></polyline>
+                        <line x1="21" y1="12" x2="9" y2="12"></line>
+                    </svg>
                     Logout
                 </a>
             </div>
@@ -129,6 +137,19 @@ session_start();
         const flavors = ["Chocolate", "Vanilla", "Half & Half"];
 
         function init() {
+            const eventData = JSON.parse(localStorage.getItem('festivoEvent')) || { hours: 1, occasion: 'General' };
+            const hours = eventData.hours || 1;
+            const occasion = eventData.occasion;
+
+            // Pricing Multiplier Table (for decor items in cart)
+            let multiplier = 1.00;
+            if (hours >= 10) multiplier = 0.60;
+            else if (hours >= 7) multiplier = 0.68;
+            else if (hours >= 4) multiplier = 0.80;
+            
+            window.pricingMultiplier = multiplier;
+            window.bookingHours = hours;
+
             document.getElementById('occasionVibe').innerText = `Styling for: ${occasion}`;
             renderCatering();
             updateCartUI();
@@ -253,7 +274,19 @@ session_start();
 
         function updateCartUI() {
             const count = cart.length;
-            const total = cart.reduce((s, i) => s + (i.price * (i.quantity || 1)), 0);
+            const total = cart.reduce((sum, item) => {
+                const name = item.name.toLowerCase();
+                const category = (item.category || '').toLowerCase();
+                const isFlatRate = item.type || 
+                                   name.includes('balloon') || category.includes('balloon') ||
+                                   name.includes('candle') || category.includes('candle') ||
+                                   name.includes('flower') || category.includes('flower') ||
+                                   name.includes('floral') || category.includes('floral');
+                
+                const itemHours = isFlatRate ? 1 : window.bookingHours;
+                const multiplier = isFlatRate ? 1 : window.pricingMultiplier;
+                return sum + (item.price * (item.quantity || 1) * itemHours * multiplier);
+            }, 0);
             document.getElementById('itemCount').innerText = `${count} items in your package`;
             document.getElementById('totalPrice').innerText = `$${total.toFixed(2)}`;
             document.getElementById('cartBadge').innerText = count;

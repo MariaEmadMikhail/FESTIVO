@@ -32,10 +32,11 @@ session_start();
             </a>
 
             <div class="nav-links" id="navLinks">
-                <a href="index.php">HOME</a>
+                <a href="index.php">Home</a>
                 <a href="occasions.php">Occasions</a>
                 <a href="products.php">Products</a>
                 <a href="catering.php">Catering</a>
+                <a href="my-orders.php">My Orders</a>
                 <a href="checkout.php" class="cart-icon">
                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
                         stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -43,6 +44,16 @@ session_start();
                         <circle cx="20" cy="21" r="1"></circle>
                         <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
                     </svg>
+                </a>
+                <a href="../backend/logout.php" class="logout-btn">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                        style="margin-right: 5px; vertical-align: text-bottom;">
+                        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                        <polyline points="16 17 21 12 16 7"></polyline>
+                        <line x1="21" y1="12" x2="9" y2="12"></line>
+                    </svg>
+                    Logout
                 </a>
             </div>
             <button class="menu-toggle" id="mobileMenuBtn">
@@ -58,7 +69,7 @@ session_start();
                 Back to Cart
             </a>
             
-            <h1 class="section-title" style="text-align: left; margin-top: 1rem;">Finalize Your Order</h1>
+            <h1 class="section-title" style="text-align: left; margin-top: 1rem;">Payment & Details</h1>
             
             <div class="payment-grid">
                 <!-- Left: Forms -->
@@ -101,7 +112,7 @@ session_start();
                     </div>
 
                     <button class="primary-btn" id="confirmBtn" style="width: 100%; margin-top: 2rem; padding: 1.5rem;">
-                        Confirm Your Order
+                        Complete Order
                     </button>
                 </div>
 
@@ -170,22 +181,48 @@ session_start();
             document.getElementById('eventRecap').innerHTML = eventHtml;
 
             const hours = eventData.hours || 1;
+            
+            // Pricing Multiplier Table
+            let multiplier = 1.00;
+            if (hours >= 10) multiplier = 0.60;
+            else if (hours >= 7) multiplier = 0.68;
+            else if (hours >= 4) multiplier = 0.80;
 
             // Items List
             document.getElementById('itemsRecap').innerHTML = cart.map(i => {
-                const itemHours = i.type ? 1 : hours;
+                const name = i.name.toLowerCase();
+                const category = (i.category || '').toLowerCase();
+                const isFlatRate = i.type || 
+                                   name.includes('balloon') || category.includes('balloon') ||
+                                   name.includes('candle') || category.includes('candle') ||
+                                   name.includes('flower') || category.includes('flower') ||
+                                   name.includes('floral') || category.includes('floral');
+                
+                const itemHours = isFlatRate ? 1 : hours;
+                const itemMultiplier = isFlatRate ? 1 : multiplier;
+                const subtotal = i.price * (i.quantity || 1) * itemHours * itemMultiplier;
+
                 return `
                 <div class="summary-item" style="margin-bottom: 0.5rem;">
-                    <span class="label">${i.name} x${i.quantity || 1} ${itemHours > 1 ? `(${itemHours} hr)` : ''}</span>
-                    <span class="value">$${(i.price * (i.quantity || 1) * itemHours).toFixed(2)}</span>
+                    <span class="label">${i.name} x${i.quantity || 1} ${!isFlatRate && itemHours > 1 ? `(${itemHours} hr)` : ''} ${!isFlatRate && itemMultiplier < 1 ? `(${itemMultiplier} disc.)` : ''}</span>
+                    <span class="value">$${subtotal.toFixed(2)}</span>
                 </div>
                 `;
             }).join('');
 
             // Total
             const total = cart.reduce((s, i) => {
-                const itemHours = i.type ? 1 : hours;
-                return s + (i.price * (i.quantity || 1) * itemHours);
+                const name = i.name.toLowerCase();
+                const category = (i.category || '').toLowerCase();
+                const isFlatRate = i.type || 
+                                   name.includes('balloon') || category.includes('balloon') ||
+                                   name.includes('candle') || category.includes('candle') ||
+                                   name.includes('flower') || category.includes('flower') ||
+                                   name.includes('floral') || category.includes('floral');
+                
+                const itemHours = isFlatRate ? 1 : hours;
+                const itemMultiplier = isFlatRate ? 1 : multiplier;
+                return s + (i.price * (i.quantity || 1) * itemHours * itemMultiplier);
             }, 0);
             document.getElementById('finalTotal').innerText = `$${total.toFixed(2)}`;
         }

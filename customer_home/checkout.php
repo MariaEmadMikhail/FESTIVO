@@ -32,10 +32,11 @@ session_start();
             </a>
 
             <div class="nav-links" id="navLinks">
-                <a href="index.php">HOME</a>
+                <a href="index.php">Home</a>
                 <a href="occasions.php">Occasions</a>
                 <a href="products.php">Products</a>
                 <a href="catering.php">Catering</a>
+                <a href="my-orders.php">My Orders</a>
 
                 <a href="checkout.php" class="cart-icon active" title="My Cart">
                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
@@ -48,6 +49,13 @@ session_start();
                 </a>
 
                 <a href="../backend/logout.php" class="logout-btn">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                        style="margin-right: 5px; vertical-align: text-bottom;">
+                        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                        <polyline points="16 17 21 12 16 7"></polyline>
+                        <line x1="21" y1="12" x2="9" y2="12"></line>
+                    </svg>
                     Logout
                 </a>
             </div>
@@ -65,7 +73,7 @@ session_start();
                 Back to Selection
             </a>
             
-            <h1 class="section-title" style="text-align: left; margin-top: 1rem;">Review Your Package</h1>
+            <h1 class="section-title" style="text-align: left; margin-top: 1rem;">My Cart</h1>
             <p style="color: var(--text-muted); margin-bottom: 3rem;">Finalize your event details and confirm your selection.</p>
 
             <table class="checkout-table" id="checkoutTable">
@@ -89,7 +97,7 @@ session_start();
                     <span class="grand-total-value" id="grandTotal">$0.00</span>
                 </div>
                 <button class="primary-btn" id="confirmOrderBtn" style="padding: 1.2rem 3rem; font-size: 1.1rem;">
-                    Proceed
+                    Next: Checkout
                 </button>
             </div>
             
@@ -106,6 +114,12 @@ session_start();
         let cart = JSON.parse(localStorage.getItem('festivoCart')) || [];
         const eventData = JSON.parse(localStorage.getItem('festivoEvent')) || { hours: 1 };
         const hours = eventData.hours || 1;
+
+        // Pricing Multiplier Table
+        let multiplier = 1.00;
+        if (hours >= 10) multiplier = 0.60;
+        else if (hours >= 7) multiplier = 0.68;
+        else if (hours >= 4) multiplier = 0.80;
 
         function init() {
             renderCart();
@@ -135,8 +149,18 @@ session_start();
 
             list.innerHTML = cart.map((item, index) => {
                 const itemQuantity = item.quantity || 1;
-                const itemHours = item.type ? 1 : hours;
-                const subtotal = item.price * itemQuantity * itemHours;
+                const name = item.name.toLowerCase();
+                const category = (item.category || '').toLowerCase();
+                const isFlatRate = item.type || 
+                                   name.includes('balloon') || category.includes('balloon') ||
+                                   name.includes('candle') || category.includes('candle') ||
+                                   name.includes('flower') || category.includes('flower') ||
+                                   name.includes('floral') || category.includes('floral');
+
+                const itemHours = isFlatRate ? 1 : hours;
+                const itemMultiplier = isFlatRate ? 1 : multiplier;
+                const subtotal = item.price * itemQuantity * itemHours * itemMultiplier;
+                
                 const options = [];
                 if (item.color) options.push(`Color: ${item.color}`);
                 if (item.flavor) options.push(`Flavor: ${item.flavor}`);
@@ -153,15 +177,17 @@ session_start();
                                 </div>
                             </div>
                         </td>
-                        <td data-label="Price" class="math-calc">$${item.price.toFixed(2)}${itemHours > 1 ? ` x ${itemHours} hr(s)` : ''}</td>
+                        <td data-label="Price" class="math-calc">
+                            $${item.price.toFixed(2)}
+                            ${!isFlatRate && itemHours > 1 ? `<br><small style="color: var(--text-muted)">x ${itemHours} hr(s)</small>` : ''}
+                            ${!isFlatRate && itemMultiplier < 1 ? `<br><small style="color: var(--secondary)">x ${itemMultiplier} disc.</small>` : ''}
+                            ${isFlatRate ? `<br><small style="color: var(--secondary)">Flat Rate</small>` : ''}
+                        </td>
                         <td data-label="Quantity" class="math-calc">
                             x${itemQuantity}
                         </td>
                         <td data-label="Total">
                             <div class="row-total">$${subtotal.toFixed(2)}</div>
-                            <div style="font-size: 0.7rem; color: var(--text-muted);" class="math-calc">
-                                ($${item.price.toFixed(2)} x ${itemQuantity}${itemHours > 1 ? ` x ${itemHours}hr` : ''})
-                            </div>
                         </td>
                         <td style="text-align: right;">
                             <button onclick="removeItem(${index})" style="background: none; border: none; color: var(--accent); cursor: pointer; padding: 0.5rem;" title="Remove">
@@ -184,8 +210,17 @@ session_start();
 
         function updateTotal() {
             const total = cart.reduce((s, i) => {
-                const itemHours = i.type ? 1 : hours;
-                return s + (i.price * (i.quantity || 1) * itemHours);
+                const name = i.name.toLowerCase();
+                const category = (i.category || '').toLowerCase();
+                const isFlatRate = i.type || 
+                                   name.includes('balloon') || category.includes('balloon') ||
+                                   name.includes('candle') || category.includes('candle') ||
+                                   name.includes('flower') || category.includes('flower') ||
+                                   name.includes('floral') || category.includes('floral');
+                
+                const itemHours = isFlatRate ? 1 : hours;
+                const itemMultiplier = isFlatRate ? 1 : multiplier;
+                return s + (i.price * (i.quantity || 1) * itemHours * itemMultiplier);
             }, 0);
             document.getElementById('grandTotal').innerText = `$${total.toFixed(2)}`;
         }

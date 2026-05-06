@@ -32,9 +32,11 @@ session_start();
             </a>
 
             <div class="nav-links" id="navLinks">
-                <a href="index.php">HOME</a>
+                <a href="index.php">Home</a>
                 <a href="occasions.php">Occasions</a>
                 <a href="products.php" class="active">Products</a>
+                <a href="catering.php">Catering</a>
+                <a href="my-orders.php">My Orders</a>
 
                 <a href="checkout.php" class="cart-icon" title="My Cart">
                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
@@ -69,11 +71,17 @@ session_start();
     <main style="margin-top: 80px; padding-bottom: 120px;">
         <div class="section-container" style="padding-bottom: 0;">
             <a href="occasions.php" class="back-btn">
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="19" y1="12" x2="5" y2="12"></line>
+                    <polyline points="12 19 5 12 12 5"></polyline>
+                </svg>
                 Back to Occasions
             </a>
             <h1 class="section-title" style="margin-bottom: 1rem;">Select Your Decor</h1>
-            <p style="text-align: center; color: var(--text-muted); margin-bottom: 3rem;">Browse through categories and add items to your event package. <br/><strong style="color: var(--secondary);">Note: Prices may differ according to your booking duration.</strong></p>
+            <p style="text-align: center; color: var(--text-muted); margin-bottom: 3rem;">Browse through categories and
+                add items to your event package. <br /><strong style="color: var(--secondary);">Note: Prices may differ
+                    according to your booking duration.</strong></p>
         </div>
 
         <!-- Category Bar -->
@@ -125,46 +133,77 @@ session_start();
 
         // Initialize Page
         async function init() {
-            try {
-                await fetchCategories();
-                if (categories.length > 0) {
-                    currentCategory = categories[0];
-                    await fetchProducts();
-                }
-                updateCartUI();
+            const eventData = JSON.parse(localStorage.getItem('festivoEvent')) || { hours: 1 };
+            const hours = eventData.hours || 1;
 
-                // Mobile menu toggle
-                document.getElementById('mobileMenuBtn').addEventListener('click', function () {
-                    document.getElementById('navLinks').classList.toggle('active');
-                    this.classList.toggle('open');
-                });
-            } catch (error) {
-                console.error("Failed to initialize products page:", error);
+            // Pricing Multiplier Table
+            let multiplier = 1.00;
+            if (hours >= 10) multiplier = 0.60;
+            else if (hours >= 7) multiplier = 0.68;
+            else if (hours >= 4) multiplier = 0.80;
+
+            window.pricingMultiplier = multiplier;
+            window.bookingHours = hours;
+
+            await fetchCategories();
+            if (categories.length > 0) {
+                currentCategory = categories[0];
+                await fetchProducts();
             }
+            updateCartUI();
+
+            // Mobile menu toggle
+            document.getElementById('mobileMenuBtn').addEventListener('click', function () {
+                document.getElementById('navLinks').classList.toggle('active');
+                this.classList.toggle('open');
+            });
         }
 
         async function fetchCategories() {
             const response = await fetch('../backend/get_categories.php');
             const data = await response.json();
-            categories = data.map(cat => cat.name);
+            categories = [];
+            data.forEach(cat => {
+                if (cat.name === "Candles and Lanterns") {
+                    categories.push("Candles");
+                    categories.push("Lanterns");
+                } else {
+                    categories.push(cat.name);
+                }
+            });
             renderCategories();
         }
 
         async function fetchProducts() {
             productsGrid.innerHTML = '<div style="grid-column: 1/-1; text-align: center; padding: 3rem;">Loading products...</div>';
-            
-            const response = await fetch(`../backend/get_products.php?category=${encodeURIComponent(currentCategory)}`);
+
+            let queryCategory = currentCategory;
+            let filterTerm = null;
+
+            if (currentCategory === "Candles") {
+                queryCategory = "Candles and Lanterns";
+                filterTerm = "candle";
+            } else if (currentCategory === "Lanterns") {
+                queryCategory = "Candles and Lanterns";
+                filterTerm = "lantern";
+            }
+
+            const response = await fetch(`../backend/get_products.php?category=${encodeURIComponent(queryCategory)}`);
             const data = await response.json();
-            
-            // Map DB fields to UI fields
-            productData[currentCategory] = data.map(p => ({
+
+            let filteredData = Array.isArray(data) ? data : [];
+            if (filterTerm) {
+                filteredData = filteredData.filter(p => p.name.toLowerCase().includes(filterTerm));
+            }
+
+            productData[currentCategory] = filteredData.map(p => ({
                 id: p.product_id,
                 name: p.name,
                 price: parseFloat(p.base_price),
-                icon: p.icon || "📦", // Use default if none
+                icon: p.icon || "📦",
                 colors: p.colors || []
             }));
-            
+
             renderProducts();
         }
 
@@ -176,7 +215,7 @@ session_start();
             `).join('');
         }
 
-        window.setCategory = async function(cat) {
+        window.setCategory = async function (cat) {
             currentCategory = cat;
             renderCategories();
             await fetchProducts();
@@ -196,12 +235,27 @@ session_start();
                 const quantity = cartItem ? cartItem.quantity : 1;
                 const isAdded = !!cartItem;
 
+                const name = product.name.toLowerCase();
+                const category = currentCategory.toLowerCase();
+                const isFlatRate = name.includes('balloon') || category.includes('balloon') ||
+                    name.includes('candle') || category.includes('candle') ||
+                    name.includes('flower') || category.includes('flower') ||
+                    name.includes('floral') || category.includes('floral');
+
+                const effectivePrice = isFlatRate ? product.price : (product.price * window.pricingMultiplier);
+                const totalItemPrice = isFlatRate ? (product.price * 1) : (effectivePrice * window.bookingHours);
+
                 return `
                     <div class="product-card">
                         <div class="product-img">${product.icon}</div>
                         <div class="product-info">
                             <h3>${product.name}</h3>
-                            <div class="product-price">$${product.price} <span style="font-size: 0.8rem; font-weight: 500; color: var(--text-muted);">/ hr</span></div>
+                            <div class="product-price">
+                                $${totalItemPrice.toFixed(2)} 
+                                <span style="font-size: 0.7rem; color: var(--text-muted); display: block;">
+                                    ${isFlatRate ? '(Flat rate)' : `($${product.price}/hr x ${window.bookingHours}hrs ${window.pricingMultiplier < 1 ? ` x ${window.pricingMultiplier} discount` : ''})`}
+                                </span>
+                            </div>
                         </div>
                         
                         <div class="product-controls">
@@ -233,7 +287,7 @@ session_start();
             }).join('');
         }
 
-        window.updateQty = function(id, change) {
+        window.updateQty = function (id, change) {
             const qtySpan = document.getElementById(`qty-${id}`);
             if (!qtySpan) return;
             let val = parseInt(qtySpan.innerText) + change;
@@ -252,11 +306,11 @@ session_start();
             }
         };
 
-        window.setColor = function(el, id, color) {
+        window.setColor = function (el, id, color) {
             const parent = document.getElementById(`colors-${id}`);
             parent.querySelectorAll('.color-dot').forEach(d => d.classList.remove('active'));
             el.classList.add('active');
-            
+
             // Check if this new color is in cart
             const cartItem = cart.find(item => item.id == id && item.color === color);
             const btn = document.getElementById(`btn-${id}`);
@@ -273,10 +327,10 @@ session_start();
             }
         };
 
-        window.toggleCart = function(id) {
+        window.toggleCart = function (id) {
             const colorEl = document.querySelector(`#colors-${id} .color-dot.active`);
             const currentColor = colorEl ? colorEl.style.backgroundColor : null;
-            
+
             const itemIndex = cart.findIndex(item => item.id == id && item.color === currentColor);
             const btn = document.getElementById(`btn-${id}`);
 
@@ -289,14 +343,15 @@ session_start();
                 // Add
                 const prod = productData[currentCategory].find(p => p.id == id);
                 const qty = parseInt(document.getElementById(`qty-${id}`).innerText);
-                
+
                 cart.push({
                     id: prod.id,
                     name: prod.name,
                     price: prod.price,
                     quantity: qty,
                     color: currentColor,
-                    icon: prod.icon
+                    icon: prod.icon,
+                    category: currentCategory
                 });
                 btn.classList.add('added');
                 btn.innerText = 'Added to Package';
@@ -311,7 +366,19 @@ session_start();
 
         function updateCartUI() {
             const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
-            const totalPriceVal = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+            const totalPriceVal = cart.reduce((sum, item) => {
+                const name = item.name.toLowerCase();
+                const category = (item.category || '').toLowerCase();
+                const isFlatRate = item.type ||
+                    name.includes('balloon') || category.includes('balloon') ||
+                    name.includes('candle') || category.includes('candle') ||
+                    name.includes('flower') || category.includes('flower') ||
+                    name.includes('floral') || category.includes('floral');
+
+                const itemHours = isFlatRate ? 1 : window.bookingHours;
+                const multiplier = isFlatRate ? 1 : window.pricingMultiplier;
+                return sum + (item.price * item.quantity * itemHours * multiplier);
+            }, 0);
 
             itemCount.innerText = `${cart.length} unique items selected`;
             totalPrice.innerText = `$${totalPriceVal.toFixed(2)}`;
@@ -320,7 +387,7 @@ session_start();
         }
 
         checkoutBtn.addEventListener('click', () => {
-             window.location.href = 'catering.php';
+            window.location.href = 'catering.php';
         });
 
         init();

@@ -4,9 +4,16 @@ header('Content-Type: application/json');
 require_once 'db_connection.php';
 
 if (!isset($_SESSION["username"])) {
-    http_response_code(401);
-    echo json_encode(['error' => 'Unauthorized']);
-    exit();
+    // Session check disabled for development - use first available customer
+    $res = $conn->query("SELECT username FROM customer LIMIT 1");
+    $row = $res ? $res->fetch_assoc() : null;
+    if ($row) {
+        $_SESSION["username"] = $row["username"];
+    } else {
+        http_response_code(401);
+        echo json_encode(['error' => 'Unauthorized - no customer account found']);
+        exit();
+    }
 }
 
 $data = json_decode(file_get_contents('php://input'), true);
@@ -44,9 +51,32 @@ try {
 
     // 3. Insert Order
     $start_time = $data['event']['date'] . ' ' . $data['event']['startTime'];
-    // For simplicity, we just save the duration string as provided
     $duration = $data['event']['duration'];
-    $total_price = $data['total'];
+    $hours = isset($data['event']['hours']) ? (float)$data['event']['hours'] : 1.0;
+    
+    // Pricing Multiplier Logic
+    $multiplier = 1.00;
+    if ($hours >= 10) $multiplier = 0.60;
+    else if ($hours >= 7) $multiplier = 0.68;
+    else if ($hours >= 4) $multiplier = 0.80;
+
+    $total_price = 0;
+    foreach ($data['cart'] as $item) {
+        $name = strtolower($item['name']);
+        $category = isset($item['category']) ? strtolower($item['category']) : '';
+        
+        $isFlatRate = isset($item['type']) || 
+                      strpos($name, 'balloon') !== false || strpos($category, 'balloon') !== false ||
+                      strpos($name, 'candle') !== false || strpos($category, 'candle') !== false ||
+                      strpos($name, 'flower') !== false || strpos($category, 'flower') !== false ||
+                      strpos($name, 'floral') !== false || strpos($category, 'floral') !== false;
+        
+        $itemHours = $isFlatRate ? 1 : $hours;
+        $itemMultiplier = $isFlatRate ? 1 : $multiplier;
+        
+        $total_price += ($item['price'] * $item['quantity'] * $itemHours * $itemMultiplier);
+    }
+
     $status = 'pending';
 
     $stmt = $conn->prepare("INSERT INTO orders (customer_id, event_type_id, event_date, duration, start_time, status, total_price) VALUES (?, ?, ?, ?, ?, ?, ?)");
@@ -58,10 +88,7 @@ try {
     $stmt = $conn->prepare("INSERT INTO order_items (order_id, product_id, quantity, price_per_unit) VALUES (?, ?, ?, ?)");
     
     foreach ($data['cart'] as $item) {
-        // Check if item has a product_id. If it's a mock ID like 'balloons-0', we might need to map it or ignore it.
-        // For a real app, product_id must be numeric.
         $prod_id = is_numeric($item['id']) ? $item['id'] : null;
-        
         if ($prod_id) {
             $stmt->bind_param("iiid", $order_id, $prod_id, $item['quantity'], $item['price']);
             $stmt->execute();

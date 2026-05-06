@@ -18,14 +18,12 @@ CREATE TABLE service_provider (
     email VARCHAR(150),
     phone VARCHAR(20)
 );
-
 CREATE TABLE admin (
-    admin_id INT AUTO_INCREMENT PRIMARY KEY
+    admin_id INT AUTO_INCREMENT PRIMARY KEY,
     name VARCHAR(150),
     email VARCHAR(150) UNIQUE,
-    password VARCHAR(255),
+    password VARCHAR(255)
 );
-
 CREATE TABLE event_type (
     event_type_id INT AUTO_INCREMENT PRIMARY KEY,
     name VARCHAR(100)
@@ -100,24 +98,17 @@ CREATE TABLE product_colors (
 
 CREATE TABLE order_items (
     order_item_id INT AUTO_INCREMENT PRIMARY KEY,
-    order_id INT,
-    product_id INT,
-    quantity INT NOT NULL,
+
+    order_id INT NOT NULL,
+    product_id INT NOT NULL,
+
+    quantity INT NOT NULL DEFAULT 1,
+
+    color_id INT,
+
     price_per_unit DECIMAL(10,2) NOT NULL,
 
     FOREIGN KEY (order_id) REFERENCES orders(order_id),
-    FOREIGN KEY (product_id) REFERENCES products(product_id)
+    FOREIGN KEY (product_id) REFERENCES products(product_id),
+    FOREIGN KEY (color_id) REFERENCES product_colors(color_id)
 );
-
-CREATE TABLE rental_pricing (
-    pricing_id INT AUTO_INCREMENT PRIMARY KEY,
-    min_hours INT NOT NULL,
-    max_hours INT NOT NULL,
-    multiplier DECIMAL(4,2) NOT NULL
-);
-
-INSERT INTO rental_pricing (min_hours, max_hours, multiplier) VALUES
-(1, 3, 1.00),
-(4, 6, 0.80),
-(7, 9, 0.68),
-(10, 12, 0.60);

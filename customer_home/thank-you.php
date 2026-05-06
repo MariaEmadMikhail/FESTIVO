@@ -30,6 +30,31 @@ session_start();
             <a href="index.php" class="nav-logo">
                 <img src="/FESTIVO/logo.png" alt="Festivo" style="height: 40px; vertical-align: middle;">
             </a>
+
+            <div class="nav-links" id="navLinks">
+                <a href="index.php">Home</a>
+                <a href="occasions.php">Occasions</a>
+                <a href="products.php">Products</a>
+                <a href="catering.php">Catering</a>
+                <a href="my-orders.php">My Orders</a>
+                <a href="../backend/logout.php" class="logout-btn">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                        style="margin-right: 5px; vertical-align: text-bottom;">
+                        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                        <polyline points="16 17 21 12 16 7"></polyline>
+                        <line x1="21" y1="12" x2="9" y2="12"></line>
+                    </svg>
+                    Logout
+                </a>
+            </div>
+
+            <!-- Mobile menu toggle -->
+            <button class="menu-toggle" id="mobileMenuBtn">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
         </div>
     </nav>
 
@@ -105,6 +130,12 @@ session_start();
             localStorage.removeItem('lastOrderSummary');
             window.location.href = 'index.php';
         };
+
+        // Simple mobile menu toggle
+        document.getElementById('mobileMenuBtn')?.addEventListener('click', function () {
+            document.getElementById('navLinks').classList.toggle('active');
+            this.classList.toggle('open');
+        });
 
         init();
     </script>

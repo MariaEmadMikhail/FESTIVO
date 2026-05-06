@@ -35,19 +35,21 @@ session_start();
             </a>
 
             <div class="nav-links" id="navLinks">
-                <a href="index.php">HOME</a>
+                <a href="index.php">Home</a>
                 <a href="occasions.php" class="active">Occasions</a>
-                <a href="index.php#orders">My Orders</a>
+                <a href="products.php">Products</a>
+                <a href="catering.php">Catering</a>
+                <a href="my-orders.php">My Orders</a>
 
                 <!-- Cart Icon -->
-                <a href="#cart" class="cart-icon" title="My Cart">
+                <a href="checkout.php" class="cart-icon" title="My Cart">
                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
                         stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                         <circle cx="9" cy="21" r="1"></circle>
                         <circle cx="20" cy="21" r="1"></circle>
                         <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
                     </svg>
-                    <span class="cart-badge">0</span>
+                    <span class="cart-badge" id="cartBadge">0</span>
                 </a>
 
                 <!-- Logout -->
@@ -208,6 +210,16 @@ session_start();
                 window.location.href = this.getAttribute('href');
             }
         });
+
+        // Update cart badge from localStorage
+        function updateBadge() {
+            const cartBadge = document.getElementById('cartBadge');
+            if (cartBadge) {
+                const cart = JSON.parse(localStorage.getItem('festivoCart')) || [];
+                cartBadge.innerText = cart.length;
+            }
+        }
+        updateBadge();
 
         // ===== Occasions Selection Logic =====
         const cards = document.querySelectorAll('.occasion-card');
